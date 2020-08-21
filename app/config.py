@@ -19,7 +19,8 @@ from secret_config import (
     SECRET_KEY,
     SLACK_URL,
     MONGO_USER,
-    MONGO_PASS
+    MONGO_PASS,
+    POSTGRES_URI
 )
 
 
@@ -27,6 +28,7 @@ class BaseConfig:
     # flask_bcrypt configuration.
     APP_SETTINGS = APP_SETTINGS
     BCRYPT_LOG_ROUNDS = 12
+    POSTGRES_URI = POSTGRES_URI
 
     DEBUG = False
 
