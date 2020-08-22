@@ -12,7 +12,6 @@ class LoginApi(MethodView):
 		"""
 		docstring
 		"""
-		import ipdb; ipdb.sset_trace()
 		response = dict(status="fail")
 
 		try:
@@ -24,24 +23,30 @@ class LoginApi(MethodView):
 		
 		email = post_data.get("email")
 		password = post_data.get("password")
+		
 		obj_users = User.query.filter_by(email=email).first()
 
 		if not obj_users:
 			status_code = HTTPStatus.UNAUTHORIZED.value
 			return make_response(jsonify(response), status_code)
 		
-		if not bcrypt.check_password_hash(obj_users.password, password):
+		if not bcrypt.check_password_hash(obj_users.password.encode('utf-8'), password):
 			response.update(dict(message="Usuário ou senha incorretos!"))
 			status_code = HTTPStatus.UNAUTHORIZED.value
 			return make_response(jsonify(response), status_code)
 
+		js_user = {
+			"name": obj_users.name,
+			"email": obj_users.email,
+			"password": obj_users.password,
+			"id": obj_users.id
+		}
 		response = {
 			"token": create_access_token(
-				identity=obj_users, fresh=False #timedelta(minutes=5)
+				identity=js_user, fresh=False #timedelta(minutes=5)
 			)
 		}
 		
-
 		#if not get_jwt_identity():
 		#	response.update(
 		#		dict(
