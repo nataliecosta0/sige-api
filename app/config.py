@@ -34,12 +34,12 @@ class BaseConfig:
 
     # flask_jwt configuration.
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    JWT_BLACKLIST_ENABLED = True
+    JWT_BLACKLIST_ENABLED = False # TODO: Implementar blacklist token 
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
     JWT_SECRET_KEY = JWT_SECRET_KEY if JWT_SECRET_KEY else 'jwt*super!hard?@secret'
 
-    IP_WHITELIST = ['192.168.58.9']
+    IP_WHITELIST = ['localhost']
     SECRET_KEY = SECRET_KEY if SECRET_KEY else 'a_random*very!secret?key'
     SLACK_URL = SLACK_URL
 
