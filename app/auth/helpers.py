@@ -1,26 +1,28 @@
-from app import jwt
+from app import jwt as jwt_app
 import os
 import datetime
 from flask import json, Response, request, g
 from functools import wraps
-from app.models import TokenBlacklist, User
+from app.models import User
+from app.config import BaseConfig
+import jwt
 
-
-@jwt.token_in_blacklist_loader
-def check_token_in_blacklist(token):
-	"""
-	docstring
-	"""
-	jti = token['jti']
-	return TokenBlacklist.check_blacklist(token_id=jti)
-
-
-@jwt.user_identity_loader
-def user_identity_lookup(user):
-	"""
-	docstring
-	"""
-	return str(user.id)
+JWT_SECRET_KEY = BaseConfig().JWT_SECRET_KEY
+#@jwt_app.token_in_blacklist_loader
+#def check_token_in_blacklist(token):
+#	"""
+#	docstring
+#	"""
+#	jti = token['jti']
+#	return TokenBlacklist.check_blacklist(token_id=jti)
+#
+#
+#@jwt_app.user_identity_loader
+#def user_identity_lookup(user):
+#	"""
+#	docstring
+#	"""
+#	return str(user.id)
 
 class Auth():
 	"""
@@ -37,7 +39,7 @@ class Auth():
 				'iat': datetime.datetime.utcnow(),
 				'sub': user_id
   			}
-			return jwt.encode(payload, os.getenv('JWT_SECRET_KEY'), 'HS256').decode('utf-8')
+			return jwt.encode(payload, JWT_SECRET_KEY, 'HS256').decode('utf-8')
 		except Exception as e:
 			return Response(
 				mimetype="application/json",
@@ -65,36 +67,45 @@ class Auth():
 
 
 	# decorator
-  	@staticmethod
-  	def auth_required(func): #usar quando precisar que usuario esteja logado ACHO
+	@staticmethod
+	def auth_required(func):
 		"""
 		Auth decorator
 		"""
 		@wraps(func)
 		def decorated_auth(*args, **kwargs):
-  			if 'api-token' not in request.headers:
+			if 'api-token' not in request.headers:
 				return Response(
-  					mimetype="application/json",
-  					response=json.dumps({'error': 'Authentication token is not available, please login to get one'}),
-  					status=400
+					mimetype="application/json",
+					response=json.dumps({'error': 'Authentication token is not available, please login to get one'}),
+					status=400
 				)
-  			token = request.headers.get('api-token')
-  			data = Auth.decode_token(token)
-  			if data['error']:
+			token = request.headers.get('api-token')
+			data = Auth.decode_token(token)
+			if data['error']:
 				return Response(
-  					mimetype="application/json",
-  					response=json.dumps(data['error']),
-  					status=400
+					mimetype="application/json",
+					response=json.dumps(data['error']),
+					status=400
 				)
-        
-  			user_id = data['data']['user_id']
-  			check_user = User.get_one_user(user_id)
-  			if not check_user:
+			user_id = data['data']['user_id']
+			check_user = User.get_one_user(user_id)
+			if not check_user:
 				return Response(
-  					mimetype="application/json",
+					mimetype="application/json",
   					response=json.dumps({'error': 'user does not exist, invalid token'}),
   					status=400
 				)
-  			g.user = {'id': user_id}
-  			return func(*args, **kwargs)
+			g.user = {'id': user_id}
+			return func(*args, **kwargs)
 		return decorated_auth
+
+def custom_response(res, status_code):
+  		"""
+  		Custom Response Function
+  		"""
+  		return Response(
+    		mimetype="application/json",
+    		response=json.dumps(res),
+    		status=status_code
+  		)

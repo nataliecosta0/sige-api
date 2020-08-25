@@ -1,4 +1,4 @@
-from app import db
+from app import db, bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow import fields, Schema
 
@@ -7,11 +7,12 @@ class User(db.Model):
     """ User model"""
 
     __tablename__ = "users"
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(25), nullable=False)
     email = db.Column(db.String(45), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
-    # TODO: status_id = db.Column(db.Integer, db.ForeignKey('user_status'))
+    #status_id = db.Column(db.Integer, db.ForeignKey('user_status'))
     #created_at = db.Column(db.DateTime)
     #modified_at = db.Column(db.DateTime)
 
@@ -29,13 +30,13 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def update(self, data):
-        for key, item in data.items():
-            if key == 'password':
-                self.password = self.__generate_hash(value)
-            setattr(self, key, item)
-        #self.modified_at = datetime.datetime.utcnow()
-        db.session.commit()
+    #def update(self, data):
+    #    for key, item in data.items():
+    #        if key == 'password':
+    #            self.password = self.__generate_hash(value)
+    #        setattr(self, key, item)
+    #    #self.modified_at = datetime.datetime.utcnow()
+    #    db.session.commit()
     
     def delete(self):
         db.session.delete(self)
@@ -70,12 +71,13 @@ class UserSchema(Schema):
     #created_at = fields.DateTime(dump_only=True)
     #modified_at = fields.DateTime(dump_only=True)
 
-class UserStatus(db.Model):
-    """ User Status Model """
-
-    ___tablename___ = "user_status"
-    id = db.Column(db.Integer, primary_key=True)
-    status = db.Column(db.String(10), nullable=False)
+#class UserStatus(db.Model):
+#    """ User Status Model """
+#
+#    __tablename__ = "user_status"
+#    __table_args__ = {'extend_existing': True}
+#    id = db.Column(db.Integer, primary_key=True)
+#    status = db.Column(db.String(10), nullable=False)
 
 
 #class UserPermission(db.Model):

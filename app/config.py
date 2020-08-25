@@ -42,6 +42,7 @@ class BaseConfig:
     IP_WHITELIST = ['localhost']
     SECRET_KEY = SECRET_KEY if SECRET_KEY else 'a_random*very!secret?key'
     SLACK_URL = SLACK_URL
+    SQLALCHEMY_TRACK_MODIFICATIONS=False
 
 
 class DevelopmentConfig(BaseConfig):
