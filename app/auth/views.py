@@ -1,10 +1,16 @@
-from flask import make_response, jsonify, request
+from flask import make_response, jsonify, request, Response
 from http import HTTPStatus
 from app import bcrypt
-from models import User
+from app.models import User, UserSchema
 from flask.views import MethodView
+from app.auth.helpers import Auth, custom_response
 from werkzeug.exceptions import BadRequest
-from flask_jwt_extended import create_access_token, get_jwt_identity, create_refresh_token
+from flask_jwt_extended import create_access_token, get_jwt_identity, create_refresh_token, jwt_required
+from datetime import timedelta
+from marshmallow import ValidationError
+
+user_schema = UserSchema()
+auth = Auth()
 
 
 class LoginApi(MethodView):
@@ -35,18 +41,12 @@ class LoginApi(MethodView):
 			status_code = HTTPStatus.UNAUTHORIZED.value
 			return make_response(jsonify(response), status_code)
 
-		js_user = {
-			"name": obj_users.name,
-			"email": obj_users.email,
-			"password": obj_users.password,
-			"id": obj_users.id
-		}
-		response = {
-			"token": create_access_token(
-				identity=js_user, fresh=False #timedelta(minutes=5)
-			)
-		}
+		if not obj_users.email or not obj_users.password:
+			return custom_response({'error': 'you need email and password to sign in'}, HTTPStatus.BAD_REQUEST.value)
 		
+		user_id = obj_users.id
+
+		token = auth.generate_token(user_id)
 		#if not get_jwt_identity():
 		#	response.update(
 		#		dict(
@@ -56,4 +56,52 @@ class LoginApi(MethodView):
 		#		)
 		#	)
 		#obj_users.update(last_access_at=datetime.utcnow())
-		return make_response(jsonify(response), HTTPStatus.OK.value)
+		#return make_response(jsonify(response), HTTPStatus.OK.value)
+		return custom_response({'token': token}, HTTPStatus.OK.value) 
+
+
+class SignUpApi(MethodView):
+	"""
+	docstring
+	"""
+	def post(self):
+		
+		response = dict(status="fail")
+
+		try:
+			post_data = request.get_json(force=True) 
+		except BadRequest:
+			response.update(dict(message="O dado informado não foi aceito"))
+			status_code = HTTPStatus.BAD_REQUEST.value
+			return make_response(jsonify(response), status_code)
+
+		try:
+			data = user_schema.load(post_data)
+		except ValidationError as err:
+			print(err.messages)
+			print(err.valid_data)
+			return custom_response(err.messages, HTTPStatus.BAD_REQUEST.value)
+
+		# check if user already exist in the db
+		user_in_db = User.get_user_by_email(data.get('email'))
+
+		if user_in_db:
+			message = {'error': 'User already exist, please supply another email address'}
+			return custom_response(message, HTTPStatus.BAD_REQUEST.value)
+
+		user = User(data)
+		user.save()
+
+		user_id = user_schema.dump(user).get('id')
+
+		token = Auth.generate_token(user_id)
+
+		return custom_response({'token': token}, HTTPStatus.OK.value)
+		#return make_response(jsonify(response), HTTPStatus.OK.value)
+
+class TestLogin(MethodView):
+	decorators = [jwt_required]
+	def get(self):
+		
+		print("Fé em deus dj")
+		return make_response(jsonify({'msg': "LOGIN BOM"}), HTTPStatus.OK.value)
