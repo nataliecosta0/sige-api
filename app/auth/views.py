@@ -1,7 +1,7 @@
 from flask import make_response, jsonify, request, Response
 from http import HTTPStatus
 from app import bcrypt
-from models import User, UserSchema
+from app.models import User, UserSchema
 from flask.views import MethodView
 from app.auth.helpers import Auth, custom_response
 from werkzeug.exceptions import BadRequest
@@ -10,7 +10,7 @@ from datetime import timedelta
 from marshmallow import ValidationError
 
 user_schema = UserSchema()
-
+auth = Auth()
 
 
 class LoginApi(MethodView):
@@ -46,7 +46,7 @@ class LoginApi(MethodView):
 		
 		user_id = obj_users.id
 
-		token = Auth.generate_token(user_id)
+		token = auth.generate_token(user_id)
 		#if not get_jwt_identity():
 		#	response.update(
 		#		dict(
@@ -100,9 +100,8 @@ class SignUpApi(MethodView):
 		#return make_response(jsonify(response), HTTPStatus.OK.value)
 
 class TestLogin(MethodView):
-	import ipdb; ipdb.sset_trace()
 	decorators = [jwt_required]
-	def post(self):
+	def get(self):
 		
 		print("Fé em deus dj")
 		return make_response(jsonify({'msg': "LOGIN BOM"}), HTTPStatus.OK.value)

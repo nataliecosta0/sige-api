@@ -139,3 +139,5 @@ dmypy.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
 secret_config.py
+.vscode
+db_create.txt
