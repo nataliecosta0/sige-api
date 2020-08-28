@@ -105,3 +105,30 @@ class TestLogin(MethodView):
 		
 		print("Fé em deus dj")
 		return make_response(jsonify({'msg': "LOGIN BOM"}), HTTPStatus.OK.value)
+
+class ResetPassword(MethodView):
+
+	decorators = [jwt_required]
+	def post(self):
+		import ipdb; ipdb.sset_trace()
+
+		response = dict(status="fail")
+		try:
+			post_data = request.get_json(force=True) 
+		except BadRequest:
+			response.update(dict(message="O dado informado não foi aceito"))
+			status_code = HTTPStatus.BAD_REQUEST.value
+			return make_response(jsonify(response), status_code)
+		
+		email = post_data.get("email")
+		password = post_data.get("password")
+		
+		obj_users = User.query.filter_by(email=email).first()
+
+		if not obj_users:
+			status_code = HTTPStatus.UNAUTHORIZED.value
+			return make_response(jsonify(response), status_code)
+
+		obj_users.update({"password": password})
+
+		
