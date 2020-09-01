@@ -1,15 +1,19 @@
 from flask import Blueprint
-from .views import (LoginApi, SignUpApi, TestLogin)
+from .views import (LoginApi, SignUpApi, TestLogin, ResetPassword)
 
 
 login_view = LoginApi.as_view("login_api")
 sign_up_view = SignUpApi.as_view("sign_up_api")
 test_login_view = TestLogin.as_view("test_login")
+reset_password = ResetPassword.as_view("reset_password")
+
 
 auth_views = (
 	("/v1/auth/authenticate", login_view, ["POST"]),
 	("/v1/auth/sign_up", sign_up_view, ["POST"]),
-	("/v1/auth/test_login", test_login_view, ["GET"])
+	("/v1/auth/test_login", test_login_view, ["GET"]),
+	("/v1/auth/reset_password", reset_password, ["POST"])
+
 )
 
 auth_blueprint = Blueprint("auth", __name__)

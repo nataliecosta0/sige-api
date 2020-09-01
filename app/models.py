@@ -30,13 +30,14 @@ class User(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    #def update(self, data):
-    #    for key, item in data.items():
-    #        if key == 'password':
-    #            self.password = self.__generate_hash(value)
-    #        setattr(self, key, item)
-    #    #self.modified_at = datetime.datetime.utcnow()
-    #    db.session.commit()
+    def update(self, data):
+        for key, item in data.items():
+            if key == 'password':
+                self.password = self.__generate_hash(item)
+            setattr(self, key, self.password)
+       #self.modified_at = datetime.datetime.utcnow()
+        db.session.commit()
+
     
     def delete(self):
         db.session.delete(self)

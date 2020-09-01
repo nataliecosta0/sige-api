@@ -79,7 +79,6 @@ class Auth():
 	# 	@wraps(func)
 	# 	def decorated_auth(*args, **kwargs):
 	# 		import ipdb; ipdb.sset_trace()
-	# 		# ('Authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1OTg2MjczODgsImlhdCI6MTU5ODU0MDk4OCwic3ViIjoxfQ.S4gK8JVR4SDZymgMYhN4H9wzH5bj6__HurmbkUmmnWI')
 	# 		if 'api-token' not in request.headers:
 	# 			return Response(
 	# 				mimetype="application/json",
