@@ -31,7 +31,6 @@ class User(db.Model):
         db.session.commit()
 
     def update(self, data):
-        import ipdb; ipdb.sset_trace()
         for key, item in data.items():
             if key == 'password':
                 self.password = self.__generate_hash(item)

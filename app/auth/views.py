@@ -110,8 +110,6 @@ class ResetPassword(MethodView):
 
 	decorators = [jwt_required]
 	def post(self):
-		import ipdb; ipdb.sset_trace()
-
 		response = dict(status="fail")
 		try:
 			post_data = request.get_json(force=True) 
@@ -130,5 +128,4 @@ class ResetPassword(MethodView):
 			return make_response(jsonify(response), status_code)
 
 		obj_users.update({"password": password})
-
-		
+		return make_response(jsonify({'msg': "TROCA FOI HEIM"}), HTTPStatus.OK.value)
