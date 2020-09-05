@@ -38,7 +38,6 @@ class User(db.Model):
        #self.modified_at = datetime.datetime.utcnow()
         db.session.commit()
 
-    
     def delete(self):
         db.session.delete(self)
         db.session.commit()

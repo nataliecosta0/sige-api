@@ -34,6 +34,9 @@ def create_app(config=app_settings):
 	from app.auth import auth_blueprint
 	this_app.register_blueprint(auth_blueprint)
 
+	from app.management import management_blueprint
+	this_app.register_blueprint(management_blueprint)
+
 	return this_app
 
 app = create_app()

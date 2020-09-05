@@ -102,12 +102,9 @@ class SignUpApi(MethodView):
 class TestLogin(MethodView):
 	decorators = [jwt_required]
 	def get(self):
-		
-		print("Fé em deus dj")
 		return make_response(jsonify({'msg': "LOGIN BOM"}), HTTPStatus.OK.value)
 
 class ResetPassword(MethodView):
-
 	decorators = [jwt_required]
 	def post(self):
 		response = dict(status="fail")
