@@ -76,6 +76,8 @@ class SignUpApi(MethodView):
 			return make_response(jsonify(response), status_code)
 
 		try:
+			# import ipdb; ipdb.sset_trace()
+			post_data.update({"status_id": 3})
 			data = user_schema.load(post_data)
 		except ValidationError as err:
 			print(err.messages)
@@ -119,6 +121,7 @@ class ResetPassword(MethodView):
 		password = post_data.get("password")
 		
 		obj_users = User.query.filter_by(email=email).first()
+		import ipdb; ipdb.sset_trace()
 
 		if not obj_users:
 			status_code = HTTPStatus.UNAUTHORIZED.value
