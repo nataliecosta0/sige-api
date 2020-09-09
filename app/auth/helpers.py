@@ -1,15 +1,39 @@
 from app import jwt as jwt_app
 import os
 import datetime
-from flask import json, Response, request, g
+from flask import json, Response, request, g, jsonify, make_response
 from functools import wraps
 from app.models import User
 from app.config import BaseConfig
 import jwt
 from flask_jwt_extended import create_access_token
 
+from flask_jwt_extended import get_jwt_identity
+from app.models import User, UserPermission
+from http import HTTPStatus
+
 
 JWT_SECRET_KEY = BaseConfig().JWT_SECRET_KEY
+
+
+def master_required(func):
+	"""
+	docstring
+	1 == user
+	2 == master
+	"""
+	def wrapper(*args, **kwargs):
+		try:
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			user_permition = UserPermission.get_one_permission(current_id)
+			if user_permition.permission_id == 2:
+				return func(*args, **kwargs)
+			else:
+				return make_response(jsonify({"error": "User sem permissao"}), HTTPStatus.UNAUTHORIZED.value)
+		except Exception as e:
+			return make_response(jsonify({"error": "Usuario nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
+	return wrapper
 
 
 @jwt_app.token_in_blacklist_loader

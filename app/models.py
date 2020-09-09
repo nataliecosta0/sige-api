@@ -73,25 +73,28 @@ class UserSchema(Schema):
     
     
 class UserStatus(db.Model):
-   """ User Status Model """
+    """ User Status Model """
+    __tablename__ = "user_status"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(10), nullable=False)
 
-   __tablename__ = "user_status"
-   __table_args__ = {'extend_existing': True}
-   id = db.Column(db.Integer, primary_key=True)
-   status = db.Column(db.String(10), nullable=False)
+
+class UserPermission(db.Model):
+    """ User Permission Model """
+
+    ___tablename___ = "user_permission"
+    permission_id = db.Column(db.Integer, db.ForeignKey('permission.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+
+    @staticmethod
+    def get_one_permission(user_id):
+        return UserPermission.query.filter_by(user_id=user_id).first()
 
 
-#class UserPermission(db.Model):
-#    """ User Permission Model """
-#
-#    ___tablename___ = "user_permission"
-#    permission_id = db.Column(db.Integer, db.ForeignKey('permission'))
-#    user_id = db.Column(db.Integer, db.ForeignKey('user'))
-#
-#
-#class Permission(db.Model):
-#    """ Permission Model """
-#
-#    ___tablename___ = "permission"
-#    id = db.Column(db.Integer, primary_key=True)
-#    name = db.Column(db.String(10), nullable=False)
+class Permission(db.Model):
+    """ Permission Model """
+
+    ___tablename___ = "permission"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(10), nullable=False)
