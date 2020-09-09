@@ -37,6 +37,9 @@ def create_app(config=app_settings):
 	from app.management import management_blueprint
 	this_app.register_blueprint(management_blueprint)
 
+	from app.import_data import import_data_blueprint
+	this_app.register_blueprint(import_data_blueprint)
+
 	return this_app
 
 app = create_app()
