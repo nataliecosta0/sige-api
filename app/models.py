@@ -88,7 +88,7 @@ class UserPermission(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
 
     @staticmethod
-    def get_one_user(user_id):
+    def get_one_permission(user_id):
         return UserPermission.query.filter_by(user_id=user_id).first()
 
 
