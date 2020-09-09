@@ -76,6 +76,7 @@ class SignUpApi(MethodView):
 			return make_response(jsonify(response), status_code)
 
 		try:
+			post_data.update({"status_id": 3})
 			data = user_schema.load(post_data)
 		except ValidationError as err:
 			print(err.messages)
