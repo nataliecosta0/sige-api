@@ -18,6 +18,8 @@ Jinja2==2.11.2
 MarkupSafe==1.1.1
 marshmallow==3.7.1
 mongoengine==0.20.0
+numpy==1.19.1
+pandas==1.1.1
 parso==0.7.1
 pexpect==4.8.0
 pickleshare==0.7.5
@@ -34,3 +36,4 @@ traitlets==4.3.3
 wcwidth==0.2.5
 Werkzeug==1.0.1
 WTForms==2.3.3
+xlrd==1.2.0
