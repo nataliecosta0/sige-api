@@ -1,23 +1,24 @@
-import pandas as pd
+# import pandas as pd
+from xlrd import open_workbook
+from datetime import datetime, timedelta
 
 def loadfile(path):
-    import ipdb; ipdb.sset_trace()
+    book = open_workbook(path, on_demand=True)
+    alunos = []
+    for name in book.sheet_names():
+        sheet = book.sheet_by_name(name)
+        n_col = sheet.ncols
+        n_lines = sheet.nrows
+        columns_name = [each.value.strip() for each in sheet.row(0)]
+        for current_line in range(1, n_lines):
+            aluno = {}
+            for current_column in range(n_col):
+                col_name = columns_name[current_column]
+                cell_info = sheet.cell(current_line, current_column).value
+                if isinstance(cell_info, str):
+                    cell_info = cell_info.strip()
+                aluno.update({col_name: cell_info})
+            alunos.append(aluno)
 
-    data = pd.read_excel(path) 
-    df = pd.DataFrame(data, 
-                    columns= ['Código da Unidade', 'Nome da Unidade', 
-                    'Código do Curso', 'Nome do Curso', 'Turno (por extenso)',
-                    'RA', 'Nome', 'Data de Nascimento', 'Data de Ingresso' , 
-                    'Ano de Ingresso', 'Turma de Ingresso', 'Semestre de Ingresso',
-                    'Data de Conclusão', 'Sexo', 'Cor', 'Nacionalidade', 
-                    'Situação no Curso', 'RG', 'Email', 'Telefone', 'Nome do Pai', 
-                    'Nome da Mãe', 'Nome do Cônjuge', 'Endereço Familiar', 
-                    'Endereço Residencial', 'Bairro Comercial', 'CEP Comercial', 
-                    'Bairro Familiar', 'CEP Familiar', 'Bairro Residencial',
-                    'CEP Residencial', 'Telefone Residencial', 'Telefone Comercial', 
-                    'Fax', 'Telefone Recado', 'Cidade Comercial', 'Cidade Familiar', 
-                    'Cidade Residencial', 'CPF', 'Estabelecimento de Ensino', 
-                    'Semestre Atual', 'Semestres Cursados', 'PP', 'PR', 'Turno (numérico)', 
-                    'Naturalidade', 'Estado Naturalidade']
-                    )
-    print (df.to_dict())
+    print(alunos)
+    # return alunos

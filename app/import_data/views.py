@@ -14,12 +14,11 @@ class Upload(MethodView):
  		Upload file
   		"""
 		try:
-			import ipdb; ipdb.sset_trace()
-			file = request.files.getlist('file')
+			file_import = request.files.getlist('file')
 			path = f"/tmp/{datetime.datetime.timestamp}"
-			for f in file:
-				extention = f.filename.split(".")[1]
-				f.save(f"{path}.{extention}")
+			for each_file in file_import:
+				extention = each_file.filename.split(".")[1]
+				each_file.save(f"{path}.{extention}")
 				loadfile(f"{path}.{extention}")
 			return make_response(jsonify({'message': 'Upload realizado com sucesso'}), HTTPStatus.OK.value)
 		except Exception as e:
