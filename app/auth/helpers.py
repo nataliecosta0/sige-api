@@ -23,6 +23,7 @@ def master_required(func):
 	2 == master
 	"""
 	def wrapper(*args, **kwargs):
+		import ipdb; ipdb.sset_trace()
 		try:
 			current_tk = get_jwt_identity()
 			current_id = current_tk.get('sub')

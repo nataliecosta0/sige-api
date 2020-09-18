@@ -101,8 +101,28 @@ class SignUpApi(MethodView):
 		#return make_response(jsonify(response), HTTPStatus.OK.value)
 
 class TestLogin(MethodView):
-	decorators = [master_required ,jwt_required]
+	decorators = [master_required, jwt_required]
 	def get(self):
+		from models import InternRecords
+		aloalo = {
+			'name': 'Flavio Da Costa', 
+			'birth_date': '16/07/1993', 
+			'mother_name': 'ALALALA',
+			'spouse_name': 'ALALALA', 
+			'course_name': 'ALALALA',
+			'email': 'flavio_pistolito_mimimi@gmail.com',
+			'residential_address': 'ALALALA',
+			'residential_city': 'ALALALA', 
+			'residential_neighbourhood': 'ALALALA', 
+			'residential_cep': 'ALALALA', 
+			'residential_phone_number': 'ALALALA', 
+			'phone_number': 'ALALALA',
+			'user_id': 1
+		}
+		recordizin = InternRecords(aloalo)
+		import ipdb; ipdb.sset_trace()
+		recordizin.save()
+		print(recordizin)
 		return make_response(jsonify({"msg": "LOGIN BOM"}), HTTPStatus.OK.value)
 
 class ResetPassword(MethodView):

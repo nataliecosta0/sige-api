@@ -84,6 +84,7 @@ class UserPermission(db.Model):
     """ User Permission Model """
 
     ___tablename___ = "user_permission"
+    __table_args__ = {'extend_existing': True}
     permission_id = db.Column(db.Integer, db.ForeignKey('permission.id'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
 
@@ -96,5 +97,76 @@ class Permission(db.Model):
     """ Permission Model """
 
     ___tablename___ = "permission"
+    __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(10), nullable=False)
+
+class InternRecords(db.Model):
+    """ Intern Model """
+
+    ___tablename___ = "intern_records"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    ra = db.Column(db.String(45), nullable=False)
+    name = db.Column(db.String(45), nullable=False)
+    birth_date = db.Column(db.String(45), nullable=False)
+    mother_name = db.Column(db.String(45), nullable=False)
+    spouse_name = db.Column(db.String(45), nullable=True)
+    course_name = db.Column(db.String(100), nullable=False)
+    period = db.Column(db.String(45), nullable=False)
+    email = db.Column(db.String(45), nullable=False)
+    residential_address = db.Column(db.String(100), nullable=False)
+    residential_city = db.Column(db.String(100), nullable=False)
+    residential_neighbourhood = db.Column(db.String(100), nullable=True)
+    residential_cep = db.Column(db.String(100), nullable=True)
+    residential_phone_number = db.Column(db.String(45), nullable=True)
+    phone_number = db.Column(db.String(45), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    def __init__(self, data):
+        """
+        Class constructor
+        """
+        self.ra = data.get('ra')
+        self.name = data.get('name')
+        self.birth_date = data.get('birth_date')
+        self.mother_name = data.get('mother_name')
+        self.spouse_name = data.get('spouse_name')
+        self.course_name = data.get('course_name')
+        self.period = data.get('period')
+        self.email = data.get('email')
+        self.residential_address = data.get('residential_address')
+        self.residential_city = data.get('residential_city')
+        self.residential_neighbourhood = data.get('residential_neighbourhood')
+        self.residential_cep = data.get('residential_cep')
+        self.residential_phone_number = data.get('residential_phone_number')
+        self.phone_number = data.get('phone_number')
+        self.user_id = data.get('user_id')
+        #self.created_at = datetime.datetime.utcnow()
+        #self.modified_at = datetime.datetime.utcnow()
+        # 
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    #def update(self, data):
+    #    for key, item in data.items():
+    #        if key == 'password':
+    #            self.password = self.__generate_hash(item)
+    #        setattr(self, key, self.password)
+    #   #self.modified_at = datetime.datetime.utcnow()
+    #    db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all_interns():
+        return User.query.all()
+
+    @staticmethod
+    def get_one_intern(id):
+        return User.query.get(id)
+ 
