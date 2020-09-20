@@ -3,7 +3,7 @@ from http import HTTPStatus
 from app import bcrypt
 from app.models import User, UserSchema, UserPermission
 from flask.views import MethodView
-from app.auth.helpers import Auth, custom_response, master_required
+from app.helpers import Auth, custom_response, master_required
 from werkzeug.exceptions import BadRequest
 from flask_jwt_extended import create_access_token, get_jwt_identity, create_refresh_token, jwt_required, get_jwt_claims
 from datetime import timedelta
@@ -103,26 +103,6 @@ class SignUpApi(MethodView):
 class TestLogin(MethodView):
 	decorators = [master_required, jwt_required]
 	def get(self):
-		from models import InternRecords
-		aloalo = {
-			'name': 'Flavio Da Costa', 
-			'birth_date': '16/07/1993', 
-			'mother_name': 'ALALALA',
-			'spouse_name': 'ALALALA', 
-			'course_name': 'ALALALA',
-			'email': 'flavio_pistolito_mimimi@gmail.com',
-			'residential_address': 'ALALALA',
-			'residential_city': 'ALALALA', 
-			'residential_neighbourhood': 'ALALALA', 
-			'residential_cep': 'ALALALA', 
-			'residential_phone_number': 'ALALALA', 
-			'phone_number': 'ALALALA',
-			'user_id': 1
-		}
-		recordizin = InternRecords(aloalo)
-		import ipdb; ipdb.sset_trace()
-		recordizin.save()
-		print(recordizin)
 		return make_response(jsonify({"msg": "LOGIN BOM"}), HTTPStatus.OK.value)
 
 class ResetPassword(MethodView):

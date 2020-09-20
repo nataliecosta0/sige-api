@@ -5,6 +5,8 @@ from http import HTTPStatus
 from flask_jwt_extended import jwt_required
 import datetime
 from app.import_data.load_file import loadfile
+from marshmallow import ValidationError
+
 
 
 class Upload(MethodView):
@@ -19,7 +21,25 @@ class Upload(MethodView):
 			for each_file in file_import:
 				extention = each_file.filename.split(".")[1]
 				each_file.save(f"{path}.{extention}")
-				loadfile(f"{path}.{extention}")
+				try:
+					loadfile(f"{path}.{extention}")
+
+				except ValidationError as err:
+
+					user_msg = ""
+					for line, content_line  in err.messages.items():
+						for column in content_line.keys():
+							if user_msg:
+								user_msg += ", "
+							msg = f"Erro na linha {line + 1} coluna {column}"
+
+							user_msg += msg
+
+					return make_response(jsonify({'error': user_msg + "."}), HTTPStatus.BAD_REQUEST.value)
+
 			return make_response(jsonify({'message': 'Upload realizado com sucesso'}), HTTPStatus.OK.value)
+		except ValueError as e:
+			# TODO: verificar outros casos que podem entrar nesta excecao.
+			return make_response(jsonify({'error': 'O RA deve conter apenas numeros.'}), HTTPStatus.BAD_REQUEST.value) 
 		except Exception as e:
 			return make_response(jsonify({'error': 'ouve um erro ao carregar o arquivo'}), HTTPStatus.BAD_REQUEST.value)
