@@ -3,16 +3,16 @@ import os
 import datetime
 from flask import json, Response, request, g, jsonify, make_response
 from functools import wraps
-from app.models import User
 from app.config import BaseConfig
 import jwt
 from flask_jwt_extended import create_access_token
 
 from flask_jwt_extended import get_jwt_identity
-from app.models import User, UserPermission
+from app.models import User, UserPermission, InternRecord, InternSchema
 from http import HTTPStatus
 
 
+intern_schema = InternSchema(many=True)
 JWT_SECRET_KEY = BaseConfig().JWT_SECRET_KEY
 
 
@@ -137,3 +137,36 @@ def custom_response(res, status_code):
     		response=json.dumps(res),
     		status=status_code
   		)
+
+
+def save_in_intern_record(studants):
+	all_studants = []
+	for studant in studants:
+		studant_register = {
+			'ra': int(studant.get('RA')),
+			'name': studant.get('Nome'),
+			'birth_date': studant.get('Data de Nascimento'), 
+			'mother_name': studant.get('Nome da Mãe'),
+			'spouse_name': studant.get('Nome do Cônjuge'), 
+			'course_name': studant.get('Nome do Curso'),
+			'period': studant.get('Turno (por extenso)'),
+			'email': studant.get('Email'),
+			'residential_address': studant.get('Endereço Residencial'),
+			'residential_city': studant.get('Cidade Residencial'), 
+			'residential_neighbourhood': studant.get('Bairro Familiar'), 
+			'residential_cep': studant.get('CEP Residencial'), 
+			'residential_phone_number': studant.get('Telefone Residencial'), 
+			'phone_number': studant.get('Telefone'),
+			'user_id': 1
+		}
+		all_studants.append(studant_register)
+
+	InternSchema(many=True).load(all_studants)
+
+	for studant_data in all_studants:
+		records = InternRecord(studant_data)
+		student_by_ra = records.get_intern_by_ra(studant_data.get('ra'))
+		if student_by_ra:
+			student_by_ra.update(studant_data)
+		else:
+			records.save()
