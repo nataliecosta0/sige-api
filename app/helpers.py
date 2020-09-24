@@ -36,6 +36,27 @@ def master_required(func):
 	return wrapper
 
 
+def check_user_status(func):
+	"""
+	docstring
+	1 - Ativo
+	2 - Inativo
+	3 - Pendente
+	"""
+	def wrapper(*args, **kwargs):
+		try:
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			current_user = User.get_one_user(current_id)
+			if user_permition.permission_id == 2:
+				return func(*args, **kwargs)
+			else:
+				return make_response(jsonify({"error": "User sem permissao"}), HTTPStatus.UNAUTHORIZED.value)
+		except Exception as e:
+			return make_response(jsonify({"error": "Usuario nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
+	return wrapper
+
+
 @jwt_app.token_in_blacklist_loader
 def check_token_in_blacklist(token):
 	"""
