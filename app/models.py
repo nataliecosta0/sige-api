@@ -35,8 +35,8 @@ class User(db.Model):
         for key, item in data.items():
             if key == 'password':
                 self.password = self.__generate_hash(item)
-            setattr(self, key, self.password)
-       #self.modified_at = datetime.datetime.utcnow()
+            else:
+                setattr(self, key, item)
         db.session.commit()
 
     def delete(self):
@@ -54,6 +54,10 @@ class User(db.Model):
     @staticmethod
     def get_user_by_email(value):
         return User.query.filter_by(email=value).first()
+
+    @staticmethod
+    def get_active_user():
+        return User.query.filter_by(status_id=1)
 
     def __generate_hash(self, password):
         return bcrypt.generate_password_hash(password, rounds=10).decode("utf-8")
@@ -91,6 +95,11 @@ class UserPermission(db.Model):
     @staticmethod
     def get_one_permission(user_id):
         return UserPermission.query.filter_by(user_id=user_id).first()
+
+    def update(self, data):
+        for key, item in data.items():
+            setattr(self, key, item)
+        db.session.commit()
 
 
 class Permission(db.Model):

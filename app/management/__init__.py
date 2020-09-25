@@ -1,11 +1,19 @@
 from flask import Blueprint
-from .views import (DeleteApi)
+from .views import (DeleteUser, DisableUser, RoleUser, GetUsers)
 
 
-delete_view = DeleteApi.as_view("delete_view")
+delete_view = DeleteUser.as_view("delete_view")
+disable_view = DisableUser.as_view("disable_view")
+role_user_view = RoleUser.as_view("role_user_view")
+get_users_view = GetUsers.as_view("get_users_view")
+
+
 
 management_views = (
-	("/v1/auth/management/users/<user_id>/delete", delete_view, ["DELETE"]),
+	("/v1/management/users/<user_id>", delete_view, ["DELETE"]),
+	("/v1/management/users/<user_id>/disable", disable_view, ["PUT"]),
+	("/v1/management/users/<user_id>/role", role_user_view, ["PUT"]),
+	("/v1/management/users/active", get_users_view, ["GET"]),
 )
 
 management_blueprint = Blueprint("management", __name__)
