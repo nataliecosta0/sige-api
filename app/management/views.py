@@ -16,8 +16,10 @@ class DeleteUser(MethodView):
   		"""
 		try:
 			user = User.get_one_user(user_id)
-			if not user:
+			permission = UserPermission.get_one_permission(user_id)
+			if not all([user or permission]):
 				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
+			permission.delete()
 			user.delete()
 			return make_response(jsonify({'message': 'deleted'}), HTTPStatus.OK.value)
 		except Exception as e:
@@ -44,6 +46,25 @@ class DisableUser(MethodView):
 		except Exception as e:
 			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)
 
+
+class EnableUser(MethodView):
+	decorators = [master_required, jwt_required]
+	def put(self, user_id=None):
+		"""
+ 		Enable a user
+  		"""
+		try:
+			# TODO: Validar para o usuario n poder disativar o proprio usuario
+			user = User.get_one_user(user_id)
+			if not user:
+				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
+			if user.status_id ==  1:
+				return make_response(jsonify({'message': 'O usuario ja esta ativo.'}), HTTPStatus.BAD_REQUEST.value) 
+
+			user.update({"status_id": 1})
+			return make_response(jsonify({'message': 'Usuario ativo com sucesso.'}), HTTPStatus.OK.value)
+		except Exception as e:
+			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)
 
 
 class RoleUser(MethodView):
@@ -76,15 +97,30 @@ class RoleUser(MethodView):
 		except Exception as e:
 			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)
 
-class GetUsers(MethodView):
+
+class GetEnableUsers(MethodView):
 	decorators = [master_required, jwt_required]
 	def get(self):
 		"""
 		Retorna users ativos 
 		"""
 		try:
-			active_users = User.get_active_user()
+			active_users = User.get_status_user(status=1)
 			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in active_users]}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
-			return make_response(jsonify({'message': 'Nenhum user emcontrado'}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+
+
+class GetPendingUsers(MethodView):
+	decorators = [master_required, jwt_required]
+	def get(self):
+		"""
+		Retorna users ativos 
+		"""
+		try:
+			active_users = User.get_status_user(status=3)
+			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in active_users]}
+			return make_response(jsonify(response), HTTPStatus.OK.value)
+		except Exception as e:
+			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)

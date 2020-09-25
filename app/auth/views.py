@@ -96,11 +96,18 @@ class SignUpApi(MethodView):
 		user = User(data)
 		user.save()
 
-		user_id = user_schema.dump(user).get('id')
+		user_id = user.id
 
-		token = Auth.generate_token(user_id)
+		permission = UserPermission.get_one_permission(user_id)
+		if not permission:
+			user_permission = UserPermission(
+				data={"permission_id": 1, "user_id": user_id}
+				)
+			user_permission.save()
 
-		return custom_response({'token': token}, HTTPStatus.OK.value)
+		# token = Auth.generate_token(user_id)
+
+		return make_response(jsonify({'msg': "Usuario Criado com sucesso."}), HTTPStatus.OK.value)
 		#return make_response(jsonify(response), HTTPStatus.OK.value)
 
 class TestLogin(MethodView):

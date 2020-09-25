@@ -56,8 +56,8 @@ class User(db.Model):
         return User.query.filter_by(email=value).first()
 
     @staticmethod
-    def get_active_user():
-        return User.query.filter_by(status_id=1)
+    def get_status_user(status):
+        return User.query.filter_by(status_id=status)
 
     def __generate_hash(self, password):
         return bcrypt.generate_password_hash(password, rounds=10).decode("utf-8")
@@ -91,6 +91,21 @@ class UserPermission(db.Model):
     __table_args__ = {'extend_existing': True}
     permission_id = db.Column(db.Integer, db.ForeignKey('permission.id'), primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+
+    def __init__(self, data):
+        """
+        Class constructor
+        """
+        self.permission_id = data.get('permission_id')
+        self.user_id = data.get('user_id')
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
 
     @staticmethod
     def get_one_permission(user_id):
