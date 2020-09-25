@@ -3,7 +3,7 @@ from http import HTTPStatus
 from app import bcrypt
 from app.models import User, UserSchema, UserPermission
 from flask.views import MethodView
-from app.helpers import Auth, custom_response, master_required
+from app.helpers import Auth, custom_response, master_required, check_user_status
 from werkzeug.exceptions import BadRequest
 from flask_jwt_extended import create_access_token, get_jwt_identity, create_refresh_token, jwt_required, get_jwt_claims
 from datetime import timedelta
@@ -44,8 +44,11 @@ class LoginApi(MethodView):
 		if not obj_users.email or not obj_users.password:
 			return custom_response({'error': 'you need email and password to sign in'}, HTTPStatus.BAD_REQUEST.value)
 		
-		user_id = obj_users.id
+		status_response = check_user_status(obj_users.status_id)
+		if status_response:
+			return status_response
 
+		user_id = obj_users.id
 		token = auth.generate_token(user_id)
 		#if not get_jwt_identity():
 		#	response.update(

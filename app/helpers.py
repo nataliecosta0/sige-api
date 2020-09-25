@@ -36,6 +36,48 @@ def master_required(func):
 	return wrapper
 
 
+def decorator_check_user_status(func):
+	"""
+	decorator inativo
+	docstring
+	1 - Ativo
+	2 - Inativo
+	3 - Pendente
+	"""
+	def wrapper(*args, **kwargs):
+		try:
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			current_user = User.get_one_user(current_id)
+			user_status = current_user.status_id
+			if user_status == 1:
+				return func(*args, **kwargs)
+			elif user_status == 2:
+				return make_response(jsonify({"error": "Usuario Inativo"}), HTTPStatus.UNAUTHORIZED.value)
+			elif user_status == 3:
+				return make_response(jsonify({"error": "Usuario Pendente de aprovacao"}), HTTPStatus.UNAUTHORIZED.value)
+		except Exception as e:
+			return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
+	return wrapper
+
+def check_user_status(user_status) -> (None, callable):
+	"""
+	docstring
+	1 - Ativo
+	2 - Inativo
+	3 - Pendente
+	"""
+	try:
+		if user_status == 1:
+			return None
+		elif user_status == 2:
+			return make_response(jsonify({"error": "Usuario Inativo"}), HTTPStatus.UNAUTHORIZED.value)
+		elif user_status == 3:
+			return make_response(jsonify({"error": "Usuario Pendente de aprovacao"}), HTTPStatus.UNAUTHORIZED.value)
+	except Exception as e:
+		return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
+
+
 @jwt_app.token_in_blacklist_loader
 def check_token_in_blacklist(token):
 	"""
