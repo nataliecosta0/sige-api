@@ -6,11 +6,12 @@ from flask_jwt_extended import jwt_required
 import datetime
 from app.import_data.load_file import loadfile
 from marshmallow import ValidationError
+from app.helpers import decorator_check_user_status
 
 
 
 class Upload(MethodView):
-	decorators = []
+	decorators = [decorator_check_user_status, jwt_required]
 	def post(self):
 		"""
  		Upload file
@@ -39,7 +40,7 @@ class Upload(MethodView):
 
 			return make_response(jsonify({'message': 'Upload realizado com sucesso'}), HTTPStatus.OK.value)
 		except ValueError as e:
-			# TODO: verificar outros casos que podem entrar nesta excecao.
+			# TODO: (entando aqui pelo RA) verificar outros casos que podem entrar nesta excecao (outros campos da tabela).
 			return make_response(jsonify({'error': 'O RA deve conter apenas numeros.'}), HTTPStatus.BAD_REQUEST.value) 
 		except Exception as e:
 			return make_response(jsonify({'error': 'ouve um erro ao carregar o arquivo'}), HTTPStatus.BAD_REQUEST.value)

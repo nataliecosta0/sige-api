@@ -5,9 +5,8 @@ from flask import json, Response, request, g, jsonify, make_response
 from functools import wraps
 from app.config import BaseConfig
 import jwt
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_identity
 
-from flask_jwt_extended import get_jwt_identity
 from app.models import User, UserPermission, InternRecord, InternSchema
 from http import HTTPStatus
 
@@ -76,7 +75,7 @@ def check_user_status(user_status) -> (None, callable):
 			return make_response(jsonify({"error": "Usuario Pendente de aprovacao"}), HTTPStatus.UNAUTHORIZED.value)
 	except Exception as e:
 		return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
-
+	
 
 @jwt_app.token_in_blacklist_loader
 def check_token_in_blacklist(token):

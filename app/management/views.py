@@ -2,19 +2,24 @@ from flask.views import MethodView
 from flask import make_response, jsonify, request
 from app.models import User, UserPermission
 from http import HTTPStatus
-from flask_jwt_extended import jwt_required
-from app.helpers import master_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from app.helpers import master_required, decorator_check_user_status
 from werkzeug.exceptions import BadRequest
 
 
 
 class DeleteUser(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def delete(self, user_id=None):
 		"""
  		Delete a user
   		"""
 		try:
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			if current_id == int(user_id):
+				return make_response(jsonify({'message': 'Não é possivel deletar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
+
 			user = User.get_one_user(user_id)
 			permission = UserPermission.get_one_permission(user_id)
 			if not all([user or permission]):
@@ -27,13 +32,17 @@ class DeleteUser(MethodView):
 
 
 class DisableUser(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def put(self, user_id=None):
 		"""
  		Disable a user
   		"""
 		try:
-			# TODO: Validar para o usuario n poder disativar o proprio usuario
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			if current_id == int(user_id):
+				return make_response(jsonify({'message': 'Não é possivel desativar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
+
 
 			user = User.get_one_user(user_id)
 			if not user:
@@ -48,13 +57,12 @@ class DisableUser(MethodView):
 
 
 class EnableUser(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def put(self, user_id=None):
 		"""
  		Enable a user
   		"""
 		try:
-			# TODO: Validar para o usuario n poder disativar o proprio usuario
 			user = User.get_one_user(user_id)
 			if not user:
 				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
@@ -68,13 +76,17 @@ class EnableUser(MethodView):
 
 
 class RoleUser(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def put(self, user_id=None):
 		"""
  		Altera o nivel do usuario.
   		"""
 		try:
-			# TODO: Validar para o usuario n poder mudar a propria permissao
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			if current_id == int(user_id):
+				return make_response(jsonify({'message': 'Não é possivel alterar a permissao desse usuario'}), HTTPStatus.BAD_REQUEST.value) 
+
 			response = dict(status="fail")
 
 			post_data = request.get_json(force=True) 
@@ -99,7 +111,7 @@ class RoleUser(MethodView):
 
 
 class GetEnableUsers(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def get(self):
 		"""
 		Retorna users ativos 
@@ -112,15 +124,30 @@ class GetEnableUsers(MethodView):
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
 
 
+class GetDisableUsers(MethodView):
+	decorators = [master_required, decorator_check_user_status, jwt_required]
+	def get(self):
+		"""
+		Retorna users inativos 
+		"""
+		try:
+			disable_users = User.get_status_user(status=2)
+			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in disable_users]}
+			return make_response(jsonify(response), HTTPStatus.OK.value)
+		except Exception as e:
+			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+
+
 class GetPendingUsers(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def get(self):
 		"""
 		Retorna users ativos 
 		"""
 		try:
-			active_users = User.get_status_user(status=3)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in active_users]}
+			pending_users = User.get_status_user(status=3)
+			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in pending_users]}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+

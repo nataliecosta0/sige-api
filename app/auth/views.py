@@ -3,7 +3,7 @@ from http import HTTPStatus
 from app import bcrypt
 from app.models import User, UserSchema, UserPermission
 from flask.views import MethodView
-from app.helpers import Auth, custom_response, master_required, check_user_status
+from app.helpers import Auth, custom_response, master_required, check_user_status, decorator_check_user_status
 from werkzeug.exceptions import BadRequest
 from flask_jwt_extended import create_access_token, get_jwt_identity, create_refresh_token, jwt_required, get_jwt_claims
 from datetime import timedelta
@@ -111,12 +111,12 @@ class SignUpApi(MethodView):
 		#return make_response(jsonify(response), HTTPStatus.OK.value)
 
 class TestLogin(MethodView):
-	decorators = [master_required, jwt_required]
+	decorators = [master_required, decorator_check_user_status, jwt_required]
 	def get(self):
 		return make_response(jsonify({"msg": "LOGIN BOM"}), HTTPStatus.OK.value)
 
 class ResetPassword(MethodView):
-	decorators = [jwt_required]
+	decorators = [decorator_check_user_status, jwt_required]
 	def post(self):
 		response = dict(status="fail")
 		try:
