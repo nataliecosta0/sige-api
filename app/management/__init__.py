@@ -3,13 +3,13 @@ from .views import (DeleteUser, DisableUser, EnableUser,
 RoleUser, GetEnableUsers, GetDisableUsers, GetPendingUsers)
 
 
-delete_view = DeleteUser.as_view("delete_view")
-disable_view = DisableUser.as_view("disable_view")
-enable_view = EnableUser.as_view("enable_view")
-role_user_view = RoleUser.as_view("role_user_view")
-get_enable_view = GetEnableUsers.as_view("get_enable_view")
-get_disable_view = GetDisableUsers.as_view("get_disable_view")
-get_pending_view = GetPendingUsers.as_view("get_pending_view")
+delete_view = DeleteUser.as_view("delete_user")
+disable_view = DisableUser.as_view("disable_user")
+enable_view = EnableUser.as_view("enable_user")
+role_user_view = RoleUser.as_view("role_user_user")
+get_enable_view = GetEnableUsers.as_view("get_enable_user")
+get_disable_view = GetDisableUsers.as_view("get_disable_user")
+get_pending_view = GetPendingUsers.as_view("get_pending_user")
 
 management_views = (
 	("/v1/management/users/<user_id>", delete_view, ["DELETE"]),

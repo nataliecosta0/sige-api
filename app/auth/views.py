@@ -137,3 +137,36 @@ class ResetPassword(MethodView):
 
 		obj_users.update({"password": password})
 		return make_response(jsonify({'msg': "TROCA FOI HEIM"}), HTTPStatus.OK.value)
+
+class GetRoleUser(MethodView):
+	decorators = [decorator_check_user_status, jwt_required]
+	def get(self):
+		"""
+		Retorna a permissao do usuario. 
+		"""
+		try:
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
+			current_permission = UserPermission.get_one_permission(current_id)
+			response = {"user" : {"role": current_permission.permission_id}}
+			return make_response(jsonify(response), HTTPStatus.OK.value)
+		except Exception as e:
+			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+
+
+# class GetRoleUser(MethodView):
+# 	decorators = [master_required, decorator_check_user_status, jwt_required]
+# 	def get(self):
+# 		"""
+# 		Retorna as permissoes dos usuarios. 
+# 		"""
+# 		try:
+# 			active_users = User.get_status_user(status=1)
+# 			response = {"users" : [
+# 				f"{each_user.id} - {each_user.name} - permissao: {UserPermission.get_one_permission(each_user.id)}" 
+# 				for each_user in active_users
+# 				]
+# 			}
+# 			return make_response(jsonify(response), HTTPStatus.OK.value)
+# 		except Exception as e:
+# 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
