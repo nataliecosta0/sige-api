@@ -3,17 +3,19 @@ from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_mongoengine import MongoEngine
+from flask_mail import Mail
 from config import BaseConfig
 
 
-config = BaseConfig()
-app_settings = config.APP_SETTINGS
-postgres_uri = config.POSTGRES_URI
+base_config = BaseConfig()
+app_settings = base_config.APP_SETTINGS
+postgres_uri = base_config.POSTGRES_URI
 
 bcrypt = Bcrypt()
 #db = MongoEngine()
 jwt = JWTManager()
 db = SQLAlchemy()
+mail = Mail()
 
 
 def create_app(config=app_settings):
@@ -39,6 +41,13 @@ def create_app(config=app_settings):
 
 	from app.import_data import import_data_blueprint
 	this_app.register_blueprint(import_data_blueprint)
+
+	this_app.config['MAIL_SERVER']=base_config.MAIL_SERVER
+	this_app.config['MAIL_PORT']=base_config.MAIL_PORT
+	this_app.config['MAIL_USE_SSL']=True
+	this_app.config['MAIL_USERNAME']=base_config.MAIL_USERNAME
+	this_app.config['MAIL_PASSWORD']=base_config.MAIL_PASSWORD
+	mail.init_app(this_app)
 
 	return this_app
 
