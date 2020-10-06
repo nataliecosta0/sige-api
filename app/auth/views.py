@@ -228,7 +228,6 @@ class VerifyAccessRecoveryCode(MethodView):
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 		try:
-			import ipdb; ipdb.sset_trace()
 			email = post_data.get("email")
 			code_id = post_data.get("recovery_code")
 
