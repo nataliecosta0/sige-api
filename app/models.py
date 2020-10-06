@@ -68,6 +68,7 @@ class User(db.Model):
     def __repr(self):
         return '<id {}>'.format(self.id)
 
+
 class UserSchema(Schema):
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
@@ -82,6 +83,38 @@ class UserStatus(db.Model):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.String(10), nullable=False)
+
+
+class PasswordRecovery(db.Model):
+    """ User Status Model """
+    __tablename__ = "password_recovery"
+    __table_args__ = {'extend_existing': True}
+    user_id = db.Column(db.Integer, db.ForeignKey('user_status.id'), primary_key=True)
+    code_id = db.Column(db.Integer, nullable=False)
+
+    def __init__(self, data):
+        """
+        Class constructor
+        """
+        self.code_id = data.get('code_id')
+        self.user_id = data.get('user_id')
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_one_password_recovery(user_id):
+        return PasswordRecovery.query.filter_by(user_id=user_id).first()
+
+    def update(self, data):
+        for key, item in data.items():
+            setattr(self, key, item)
+        db.session.commit()
 
 
 class UserPermission(db.Model):
@@ -124,6 +157,7 @@ class Permission(db.Model):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(10), nullable=False)
+
 
 class InternRecord(db.Model):
     """ Intern Model """

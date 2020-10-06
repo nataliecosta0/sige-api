@@ -20,7 +20,11 @@ from secret_config import (
     SLACK_URL,
     MONGO_USER,
     MONGO_PASS,
-    POSTGRES_URI
+    POSTGRES_URI,
+    MAIL_SERVER,
+    MAIL_PORT,
+    MAIL_USERNAME,
+    MAIL_PASSWORD
 )
 
 
@@ -43,6 +47,11 @@ class BaseConfig:
     SECRET_KEY = SECRET_KEY if SECRET_KEY else 'a_random*very!secret?key'
     SLACK_URL = SLACK_URL
     SQLALCHEMY_TRACK_MODIFICATIONS=False
+
+    MAIL_SERVER = MAIL_SERVER
+    MAIL_PORT = MAIL_PORT
+    MAIL_USERNAME = MAIL_USERNAME
+    MAIL_PASSWORD = MAIL_PASSWORD
 
 
 class DevelopmentConfig(BaseConfig):
@@ -75,3 +84,8 @@ class ProductionConfig(BaseConfig):
         'username': MONGO_USER,
         'password': MONGO_PASS
     }
+
+msg_de_recovery = """Olá,
+Recebemos uma solicitação para trocar a senha de acesso ao sistema Sige.
+Seu código para redefinição é {random_code}
+"""
