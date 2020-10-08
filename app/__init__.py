@@ -42,6 +42,9 @@ def create_app(config=app_settings):
 	from app.import_data import import_data_blueprint
 	this_app.register_blueprint(import_data_blueprint)
 
+	from app.intern_record import intern_record_blueprint
+	this_app.register_blueprint(intern_record_blueprint)
+
 	this_app.config['MAIL_SERVER']=base_config.MAIL_SERVER
 	this_app.config['MAIL_PORT']=base_config.MAIL_PORT
 	this_app.config['MAIL_USE_SSL']=True
