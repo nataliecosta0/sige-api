@@ -17,7 +17,7 @@ def make_dict_empresas(registro_empresa, simple=False):
         dict_empresa = dict(
             cnpj=registro_empresa.cnpj,
             company_name=registro_empresa.company_name,
-            nConvenio=registro_empresa.id,
+            id=registro_empresa.id,
         )
     else:
         dict_empresa = dict(
@@ -57,6 +57,7 @@ class Companies(MethodView):
 			return make_response(jsonify({"error": "Empresa nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
 		except Exception as e:
 			return make_response(jsonify({"error": "Empresa nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
+	
 	def post(self):
 		
 		response = dict(status="fail")
