@@ -39,12 +39,12 @@ def validate_date(start_date, ending_date):
 
 def get_all_contratos(record_contracts):
     list_contracts = [make_dict_contracts(each, simple=True) for each in record_contracts]
-    dict_contracts = dict(contracts=list_contracts)
+    dict_contracts = dict(internship_contracts=list_contracts)
     return dict_contracts
 
 
 def get_one_contrato(record_contracts):
-    dict_contracts = dict(associated_companies=make_dict_contracts(record_contracts))
+    dict_contracts = dict(internship_contracts=make_dict_contracts(record_contracts))
     return dict_contracts
 
 

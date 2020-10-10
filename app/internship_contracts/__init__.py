@@ -1,14 +1,14 @@
 from flask import Blueprint
-from .views import (Companies)
+from .views import (Contracts)
 
 
-companies_view = Companies.as_view("companies")
+contracts_view = Contracts.as_view("contracts")
 
 associated_companies_views = (
-	("/v1/associated_companies/companies", companies_view, ["GET", "POST"]),
+	("/v1/internship_contracts/contracts", contracts_view, ["GET", "POST"]),
 )
 
-associated_companies_blueprint = Blueprint("associated_companies", __name__)
+internship_contracts_blueprint = Blueprint("internship_contracts", __name__)
 
-for uri, view_func, methods in associated_companies_views:
-	associated_companies_blueprint.add_url_rule(uri, view_func=view_func, methods=methods)
+for uri, view_func, methods in internship_contracts_views:
+	internship_contracts_blueprint.add_url_rule(uri, view_func=view_func, methods=methods)
