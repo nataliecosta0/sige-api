@@ -59,7 +59,7 @@ def decorator_check_user_status(func):
 			return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
 	return wrapper
 
-def check_user_status(user_status) -> (None, callable):
+def check_user_status(user_status) -> (None):
 	"""
 	docstring
 	1 - Ativo

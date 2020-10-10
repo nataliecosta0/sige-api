@@ -261,3 +261,70 @@ class InternSchema(Schema):
     residential_phone_number = fields.Str(required=False, allow_none=True)
     phone_number = fields.Str(required=False, allow_none=True)
     user_id = fields.Int(required=True)
+
+class Company(db.Model):
+    """ Intern Model """
+
+    ___tablename___ = "company"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    cnpj = db.Column(db.BigInteger, nullable=False)
+    company_name = db.Column(db.String(45), nullable=False)
+    opening_date = db.Column(db.String(45), nullable=False)
+    contact_email = db.Column(db.String(45), nullable=False)
+    zip_code = db.Column(db.String(45), nullable=False)
+    address = db.Column(db.String(45), nullable=False)
+    contact_phone = db.Column(db.String(45), nullable=False)
+    contact_person = db.Column(db.String(45), nullable=True)
+    associated_since = db.Column(db.String(100), nullable=False)
+    associated_until = db.Column(db.String(100), nullable=True)
+
+    def __init__(self, data):
+        """
+        Class constructor
+        """
+        self.cnpj = data.get('cnpj')
+        self.company_name = data.get('company_name')
+        self.opening_date = data.get('opening_date')
+        self.contact_email = data.get('contact_email')
+        self.zip_code = data.get('zip_code')
+        self.address = data.get('address')
+        self.contact_phone = data.get('contact_phone')
+        self.contact_person = data.get('contact_person')
+        self.associated_since = data.get('associated_since')
+        self.associated_until = data.get('associated_until')
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self, data):
+        for key, item in data.items():
+            setattr(self, key, item)
+        db.session.commit()
+        
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_one_company(value):
+        return Company.query.filter_by(company_name=value).first()
+
+    @staticmethod
+    def get_all_company():
+        return Company.query.all()
+
+class CompanySchema(Schema):
+
+    id = fields.Int(dump_only=True)
+    cnpj = fields.Int(required=True)
+    company_name = fields.Str(required=True)
+    opening_date = fields.Str(required=True)
+    contact_email = fields.Str(required=True)
+    zip_code = fields.Str(required=True)
+    address = fields.Email(required=True)
+    contact_phone = fields.Str(required=True)
+    contact_person = fields.Str(required=False, allow_none=True)
+    associated_since = fields.Str(required=True)
+    associated_until = fields.Str(required=False, allow_none=True)

@@ -1,5 +1,3 @@
-import re
-from sys import intern
 from flask.views import MethodView
 from flask_jwt_extended import jwt_required
 from app.helpers import decorator_check_user_status
