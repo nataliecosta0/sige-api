@@ -1,11 +1,14 @@
 from flask import Blueprint
-from .views import (Contracts)
+from .views import (Contract)
 
 
-contracts_view = Contracts.as_view("contracts")
+contracts_view = Contract.as_view("contracts")
 
-associated_companies_views = (
+internship_contracts_views = (
+	("/v1/internship_contracts/contracts/<contract_id>", contracts_view, ["GET", "POST"]),
+	("/v1/internship_contracts/contracts/", contracts_view, ["GET", "POST"]),
 	("/v1/internship_contracts/contracts", contracts_view, ["GET", "POST"]),
+
 )
 
 internship_contracts_blueprint = Blueprint("internship_contracts", __name__)

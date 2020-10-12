@@ -56,7 +56,7 @@ def decorator_check_user_status(func):
 			elif user_status == 3:
 				return make_response(jsonify({"error": "Usuario Pendente de aprovacao"}), HTTPStatus.UNAUTHORIZED.value)
 		except Exception as e:
-			return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": "status nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
 	return wrapper
 
 def check_user_status(user_status) -> (None):
@@ -182,6 +182,8 @@ def custom_response(res, status_code):
 
 def save_in_intern_record(studants):
 	all_studants = []
+	current_tk = get_jwt_identity()
+	current_id = current_tk.get('sub')
 	for studant in studants:
 		studant_register = {
 			'ra': int(studant.get('RA')),
@@ -198,7 +200,7 @@ def save_in_intern_record(studants):
 			'residential_cep': studant.get('CEP Residencial'), 
 			'residential_phone_number': studant.get('Telefone Residencial'), 
 			'phone_number': studant.get('Telefone'),
-			'user_id': 1
+			'user_id': current_id
 		}
 		all_studants.append(studant_register)
 
