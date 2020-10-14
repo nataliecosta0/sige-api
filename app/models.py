@@ -165,7 +165,7 @@ class InternRecord(db.Model):
     ___tablename___ = "intern_record"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    ra = db.Column(db.BigInteger, nullable=False)
+    ra = db.Column(db.BigInteger, unique=True, nullable=False)
     name = db.Column(db.String(45), nullable=False)
     birth_date = db.Column(db.String(45), nullable=False)
     mother_name = db.Column(db.String(45), nullable=False)
@@ -263,7 +263,7 @@ class InternSchema(Schema):
     user_id = fields.Int(required=True)
 
 class Company(db.Model):
-    """ Intern Model """
+    """ Company Model """
 
     ___tablename___ = "company"
     __table_args__ = {'extend_existing': True}
@@ -278,8 +278,8 @@ class Company(db.Model):
     contact_person = db.Column(db.String(45), nullable=True)
     associated_since = db.Column(db.String(100), nullable=False)
     associated_until = db.Column(db.String(100), nullable=True)
-
-    def __init__(self, data):
+    
+    def __init__(self, data): 
         """
         Class constructor
         """
@@ -309,6 +309,7 @@ class Company(db.Model):
 
     @staticmethod
     def get_one_company(value):
+        a = Company.query.filter_by(company_name=value).first()
         return Company.query.filter_by(company_name=value).first()
 
     @staticmethod
@@ -321,10 +322,112 @@ class CompanySchema(Schema):
     cnpj = fields.Int(required=True)
     company_name = fields.Str(required=True)
     opening_date = fields.Str(required=True)
-    contact_email = fields.Str(required=True)
+    contact_email = fields.Email(required=True)
     zip_code = fields.Str(required=True)
-    address = fields.Email(required=True)
+    address = fields.Str(required=True)
     contact_phone = fields.Str(required=True)
     contact_person = fields.Str(required=False, allow_none=True)
     associated_since = fields.Str(required=True)
     associated_until = fields.Str(required=False, allow_none=True)
+
+class Contracts(db.Model):
+    """ Company Model """
+
+    ___tablename___ = "contracts"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
+    intern_ra = db.Column(db.Integer, db.ForeignKey('intern_record.ra'))
+    has_become_effective = db.Column(db.Integer, nullable=True)
+    has_switched_companies = db.Column(db.Integer, nullable=True)
+
+    def __init__(self, data):
+        """
+        Class constructor
+        """
+        self.company_id = data.get('company_id')
+        self.intern_ra = data.get('intern_ra')
+        self.has_become_effective = data.get('has_become_effective')
+        self.has_switched_companies = data.get('has_switched_companies')
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self, data):
+        for key, item in data.items():
+            setattr(self, key, item)
+        db.session.commit()
+        
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_one_contract(value):
+        return Contracts.query.filter_by(id=value).first()
+
+    @staticmethod
+    def get_specific_contract(data):
+        return Contracts.query.filter_by(
+            company_id=data.get("company_id"),
+            intern_ra=data.get("intern_ra")).first()
+        
+
+    @staticmethod
+    def get_all_contracts():
+        return Contracts.query.all()
+
+class ContractSchema(Schema):
+
+    id = fields.Int(dump_only=True)
+    company_id = fields.Int(required=True)
+    intern_ra = fields.Int(required=True)
+    has_become_effective = fields.Str(required=False, allow_none=True)
+    has_switched_companies = fields.Str(required=False, allow_none=True)
+
+class SubContracts(db.Model):
+    """ Sub Contract Model """
+
+    ___tablename___ = "sub_contracts"
+    __table_args__ = {'extend_existing': True}
+    id = db.Column(db.Integer, primary_key=True)
+    internship_contract_id = db.Column(db.Integer, db.ForeignKey('contracts.id'))
+    start_date = db.Column(db.String(45), nullable=False)
+    ending_date = db.Column(db.String(45), nullable=False)
+
+    def __init__(self, data):
+        """
+        Class constructor
+        """
+        self.internship_contract_id = data.get('internship_contract_id')
+        self.start_date = data.get('start_date')
+        self.ending_date = data.get('ending_date')
+    
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+    def update(self, data):
+        for key, item in data.items():
+            setattr(self, key, item)
+        db.session.commit()
+        
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_one_sub_contract(value):
+        return SubContracts.query.filter_by(internship_contract_id=value).all()
+
+    #@staticmethod
+    #def get_all_contracts():
+    #    return SubContracts.query.all()
+
+class SubContractSchema(Schema):
+
+    id = fields.Int(dump_only=True)
+    internship_contract_id = fields.Int(required=True)
+    start_date = fields.Str(required=True)
+    ending_date = fields.Str(required=True)

@@ -90,28 +90,33 @@ class SignUpApi(MethodView):
 			return custom_response(err.messages, HTTPStatus.BAD_REQUEST.value)
 
 		# check if user already exist in the db
-		user_in_db = User.get_user_by_email(data.get('email'))
+		try:
 
-		if user_in_db:
-			message = {'error': 'User already exist, please supply another email address'}
-			return custom_response(message, HTTPStatus.BAD_REQUEST.value)
+			user_in_db = User.get_user_by_email(data.get('email'))
 
-		user = User(data)
-		user.save()
+			if user_in_db:
+				message = {'error': 'User already exist, please supply another email address'}
+				return custom_response(message, HTTPStatus.BAD_REQUEST.value)
 
-		user_id = user.id
+			user = User(data)
+			user.save()
 
-		permission = UserPermission.get_one_permission(user_id)
-		if not permission:
-			user_permission = UserPermission(
-				data={"permission_id": 1, "user_id": user_id}
-				)
-			user_permission.save()
+			user_id = user.id
 
-		# token = Auth.generate_token(user_id)
+			permission = UserPermission.get_one_permission(user_id)
+			if not permission:
+				user_permission = UserPermission(
+					data={"permission_id": 1, "user_id": user_id}
+					)
+				user_permission.save()
 
-		return make_response(jsonify({'msg': "Usuario Criado com sucesso."}), HTTPStatus.OK.value)
-		#return make_response(jsonify(response), HTTPStatus.OK.value)
+			# token = Auth.generate_token(user_id)
+
+			return make_response(jsonify({'msg': "Usuário criado com sucesso."}), HTTPStatus.OK.value)
+			#return make_response(jsonify(response), HTTPStatus.OK.value)
+		except:
+			return make_response(jsonify({"error": "Erro ao criar usuário"}), HTTPStatus.BAD_REQUEST.value)
+
 
 class TestLogin(MethodView):
 	"""
