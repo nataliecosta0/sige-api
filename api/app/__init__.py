@@ -1,10 +1,15 @@
+# import os
+# import sys
+# os.chdir(sys.path[0])
+# os.chdir('../')
+
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_mongoengine import MongoEngine
 from flask_mail import Mail
-from config import BaseConfig
+from app.config import BaseConfig
 
 
 base_config = BaseConfig()
@@ -62,5 +67,5 @@ def create_app(config=app_settings):
 
 app = create_app()
 
-if __name__ == "__main__":
-	app.run(debug=True)
+# if __name__ == "__main__":
+# 	app.run(debug=True,  host='0.0.0.0')

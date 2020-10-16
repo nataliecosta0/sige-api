@@ -1,0 +1,67 @@
+version: "3.3"
+
+services:
+
+    flask:
+        build: ./api
+        container_name: flask
+        restart: always
+        ports: 
+            - "8080:8080"
+            # - "8081:8081"
+        # networks:
+        #     vpcbr:
+        #         ipv4_address: 10.5.0.5
+        depends_on:
+            - postgres
+
+        # flask:
+        #     build: ./api
+        #     container_name: flask
+        #     restart: always
+        #     environment: 
+        #         - FLASK_APP=app/__init__.py
+        #     expose: 
+        #         - 8080
+        #         - 8081
+        #     # networks:
+        #     #     vpcbr:
+        #     #         ipv4_address: 10.5.0.5
+        #     depends_on:
+        #         - postgres
+
+
+    postgres:
+        image: postgres:12-alpine
+        container_name: postgres
+        environment:
+            - POSTGRES_USER=
+            - POSTGRES_PASSWORD=
+            - POSTGRES_DB=
+            - TZ=GMT
+        volumes:
+            - "./data/postgres:/var/lib/postgresql/data"
+        ports:
+            - 5432:5432
+        # networks:
+        #     vpcbr:
+        #         ipv4_address: 10.5.0.6
+
+    nginx:
+        build: ./nginx
+        container_name: nginx
+        restart: always
+        ports: 
+            - "80:80"
+        # networks:
+        #     vpcbr:
+        #         ipv4_address: 10.5.0.7
+        depends_on:
+            - flask
+
+# networks:
+#     vpcbr:
+#         driver: bridge
+#         ipam:
+#             config:
+#                 - subnet: 10.5.0.0/16
