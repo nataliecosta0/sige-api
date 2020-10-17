@@ -141,3 +141,6 @@ dmypy.json
 secret_config.py
 .vscode
 db_create.txt
+
+uwsgi.log
+__init_.pyc

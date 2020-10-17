@@ -167,8 +167,8 @@ class GetRoleUser(MethodView):
 		Retorna a permissao do usuario. 
 		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			current_permission = UserPermission.get_one_permission(current_id)
 			response = {"user" : {"role": current_permission.permission_id}}
 			return make_response(jsonify(response), HTTPStatus.OK.value)

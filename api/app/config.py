@@ -53,6 +53,8 @@ class BaseConfig:
     MAIL_USERNAME = MAIL_USERNAME
     MAIL_PASSWORD = MAIL_PASSWORD
 
+    blacklist = set()
+
 
 class DevelopmentConfig(BaseConfig):
     BCRYPT_LOG_ROUNDS = 5

@@ -14,6 +14,8 @@ from http import HTTPStatus
 intern_schema = InternSchema(many=True)
 JWT_SECRET_KEY = BaseConfig().JWT_SECRET_KEY
 
+blacklist = BaseConfig().blacklist
+
 
 def master_required(func):
 	"""
@@ -23,8 +25,8 @@ def master_required(func):
 	"""
 	def wrapper(*args, **kwargs):
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			user_permition = UserPermission.get_one_permission(current_id)
 			if user_permition.permission_id == 2:
 				return func(*args, **kwargs)
@@ -45,8 +47,8 @@ def decorator_check_user_status(func):
 	"""
 	def wrapper(*args, **kwargs):
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			current_user = User.get_one_user(current_id)
 			user_status = current_user.status_id
 			if user_status == 1:
@@ -77,21 +79,33 @@ def check_user_status(user_status) -> (None):
 		return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
 	
 
-@jwt_app.token_in_blacklist_loader
-def check_token_in_blacklist(token):
-	"""
-	docstring
-	"""
-	jti = token['jti']
-	return TokenBlacklist.check_blacklist(token_id=jti)
+# @jwt_app.token_in_blacklist_loader
+# def check_token_in_blacklist(token):
+# 	"""
+# 	docstring
+# 	"""
+# 	jti = token['jti']
+# 	return TokenBlacklist.check_blacklist(token_id=jti)
 
+@jwt_app.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    jti = decrypted_token['jti']
+    return jti in blacklist
+
+@jwt.user_loader_callback_loader
+def load_user_on_login(identity):
+	user = User.get_one_user(identity)
+	if user:
+		return user
+	else:
+		return None
 
 @jwt_app.user_identity_loader
 def user_identity_lookup(user):
 	"""
 	docstring
 	"""
-	return str(user.id)
+	return user.get("id")
 
 class Auth():
 	"""

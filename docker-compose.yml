@@ -8,27 +8,9 @@ services:
         restart: always
         ports: 
             - "8080:8080"
-            # - "8081:8081"
-        # networks:
-        #     vpcbr:
-        #         ipv4_address: 10.5.0.5
+            # apagar portas quando em prod
         depends_on:
             - postgres
-
-        # flask:
-        #     build: ./api
-        #     container_name: flask
-        #     restart: always
-        #     environment: 
-        #         - FLASK_APP=app/__init__.py
-        #     expose: 
-        #         - 8080
-        #         - 8081
-        #     # networks:
-        #     #     vpcbr:
-        #     #         ipv4_address: 10.5.0.5
-        #     depends_on:
-        #         - postgres
 
 
     postgres:
@@ -43,25 +25,15 @@ services:
             - "./data/postgres:/var/lib/postgresql/data"
         ports:
             - 5432:5432
-        # networks:
-        #     vpcbr:
-        #         ipv4_address: 10.5.0.6
+            # apagar portas quando em prod
 
+            
     nginx:
         build: ./nginx
         container_name: nginx
         restart: always
         ports: 
             - "80:80"
-        # networks:
-        #     vpcbr:
-        #         ipv4_address: 10.5.0.7
         depends_on:
             - flask
 
-# networks:
-#     vpcbr:
-#         driver: bridge
-#         ipam:
-#             config:
-#                 - subnet: 10.5.0.0/16

@@ -15,8 +15,8 @@ class DeleteUser(MethodView):
  		Delete a user
   		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel deletar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
@@ -38,8 +38,8 @@ class DisableUser(MethodView):
  		Disable a user
   		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel desativar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
@@ -82,8 +82,8 @@ class RoleUser(MethodView):
  		Altera o nivel do usuario.
   		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel alterar a permissao desse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
