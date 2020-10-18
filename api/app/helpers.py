@@ -92,7 +92,7 @@ def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return jti in blacklist
 
-@jwt.user_loader_callback_loader
+@jwt_app.user_loader_callback_loader
 def load_user_on_login(identity):
 	user = User.get_one_user(identity)
 	if user:
@@ -105,7 +105,7 @@ def user_identity_lookup(user):
 	"""
 	docstring
 	"""
-	return user.get("id")
+	return user.get("sub")
 
 class Auth():
 	"""

@@ -63,7 +63,11 @@ class LoginApi(MethodView):
 		#	)
 		#obj_users.update(last_access_at=datetime.utcnow())
 		#return make_response(jsonify(response), HTTPStatus.OK.value)
-		return custom_response({'token': token}, HTTPStatus.OK.value) 
+		data_response = {
+			"status": HTTPStatus.OK.value,
+			"token": token
+		}
+		return custom_response(jsonify(data_response), HTTPStatus.OK.value) 
 
 
 class SignUpApi(MethodView):
