@@ -30,8 +30,9 @@ class LoginApi(MethodView):
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 		
-		email = post_data.get("email")
-		password = post_data.get("password")
+		credentials = post_data.get("credentials")
+		email = credentials.get("email")
+		password = credentials.get("password")
 		
 		obj_users = User.query.filter_by(email=email).first()
 
@@ -67,7 +68,7 @@ class LoginApi(MethodView):
 			"status": HTTPStatus.OK.value,
 			"token": token
 		}
-		return custom_response(jsonify(data_response), HTTPStatus.OK.value) 
+		return custom_response(data_response, HTTPStatus.OK.value) 
 
 
 class SignUpApi(MethodView):
