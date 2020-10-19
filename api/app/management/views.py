@@ -47,10 +47,10 @@ class DisableUser(MethodView):
 			user = User.get_one_user(user_id)
 			if not user:
 				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
-			if user.status_id ==  2:
-				return make_response(jsonify({'message': 'O usuario ja esta inativo.'}), HTTPStatus.BAD_REQUEST.value) 
+			if user.status_id ==  3:
+				return make_response(jsonify({'message': 'O usuario ja esta pendente de ativacao.'}), HTTPStatus.BAD_REQUEST.value) 
 
-			user.update({"status_id": 2})
+			user.update({"status_id": 3})
 			return make_response(jsonify({'message': 'Usuario desativado com sucesso.'}), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)
@@ -154,6 +154,7 @@ class GetPendingUsers(MethodView):
 		"""
 		try:
 			pending_users = User.get_status_user(status=3)
+			
 			response = {"users" : [{
 				"id": each_user.id, "name": each_user.name, "email": each_user.email} 
 				for each_user in pending_users

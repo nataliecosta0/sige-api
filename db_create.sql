@@ -45,10 +45,24 @@ create table user_permission(
 select * from user_permission;
 
 
--- create table intern_record(
---     id serial primary key,
---     user_id integer REFERENCES users (id)
--- );
+create table intern_record(
+    id serial primary key,
+    ra bigint UNIQUE,
+    name varchar(45) not null,
+    birth_date text not null,
+    mother_name varchar(45),
+    spouse_name varchar(45),
+    course_name varchar(100) not null,
+    period varchar(45) not null,
+    email varchar(45) not null,
+    residential_address varchar(100) not null,
+    residential_city varchar(100) not null,
+    residential_neighbourhood varchar(100),
+    residential_cep varchar(100) not null,
+    residential_phone_number varchar(45),
+    phone_number varchar(45),
+    user_id integer REFERENCES users (id)
+);
 -- insert into intern_record (user_id) values (1);
 -- select * from intern_record;
 
@@ -71,4 +85,19 @@ create table company(
     contact_person varchar(45),
     associated_since varchar(100) not null,
     associated_until varchar(100)
+);
+
+create table contracts(
+    id serial primary key,
+    company_id integer REFERENCES company (id),
+    intern_ra integer REFERENCES intern_record (ra),
+    has_become_effective integer,
+    has_switched_companies integer
+);
+
+create table sub_contracts(
+    id serial primary key,
+    internship_contract_id integer REFERENCES contracts (id),
+    start_date varchar(45) not null,
+    ending_date varchar(45) not null
 );
