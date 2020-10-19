@@ -147,11 +147,13 @@ class ResetPassword(MethodView):
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 		
-		email = post_data.get("email")
-		password = post_data.get("password")
-		
-		obj_users = User.query.filter_by(email=email).first()
 		try:
+			user_data = post_data.get("user_data")
+			email = user_data.get("email")
+			password = user_data.get("password")
+			
+			obj_users = User.query.filter_by(email=email).first()
+
 			if not obj_users:
 				user_status = obj_users.status_id
 				if user_status == 2:
@@ -193,7 +195,8 @@ class BeginAccessRecovery(MethodView):
 		random_code = randint(100000, 999999)
 
 		try:
-			post_data = request.get_json(force=True) 
+			post_data = request.get_json(force=True)
+			access_recovery_data = post_data.get("access_recovery_data")
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
 			status_code = HTTPStatus.BAD_REQUEST.value
@@ -234,14 +237,15 @@ class VerifyAccessRecoveryCode(MethodView):
 		response = dict(status="fail")
 
 		try:
-			post_data = request.get_json(force=True) 
+			post_data = request.get_json(force=True)
+			access_recovery_data = post_data.get("access_recovery_data")
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 		try:
-			email = post_data.get("email")
-			code_id = post_data.get("recovery_code")
+			email = access_recovery_data.get("email")
+			code_id = access_recovery_data.get("recovery_code")
 
 			obj_users = User.query.filter_by(email=email).first()
 			if not obj_users:
