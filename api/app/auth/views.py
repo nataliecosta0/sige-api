@@ -202,7 +202,7 @@ class BeginAccessRecovery(MethodView):
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 		try:
-			email = post_data.get("email")
+			email = access_recovery_data.get("email")
 			obj_users = User.query.filter_by(email=email).first()
 			if not obj_users:
 				return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
