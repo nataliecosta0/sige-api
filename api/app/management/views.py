@@ -118,7 +118,11 @@ class GetEnableUsers(MethodView):
 		"""
 		try:
 			active_users = User.get_status_user(status=1)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in active_users]}
+			response = {"users" : [{
+							"id": each_user.id, "name": each_user.name, "email": each_user.email} 
+							for each_user in active_users
+							]
+						}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
@@ -132,7 +136,11 @@ class GetDisableUsers(MethodView):
 		"""
 		try:
 			disable_users = User.get_status_user(status=2)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in disable_users]}
+			response = {"users" : [{
+				"id": each_user.id, "name": each_user.name, "email": each_user.email} 
+				for each_user in disable_users
+				]
+			}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
@@ -146,7 +154,11 @@ class GetPendingUsers(MethodView):
 		"""
 		try:
 			pending_users = User.get_status_user(status=3)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in pending_users]}
+			response = {"users" : [{
+				"id": each_user.id, "name": each_user.name, "email": each_user.email} 
+				for each_user in pending_users
+				]
+			}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)

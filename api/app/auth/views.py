@@ -151,6 +151,9 @@ class ResetPassword(MethodView):
 			user_data = post_data.get("user_data")
 			email = user_data.get("email")
 			password = user_data.get("password")
+			if not password:
+				return make_response(jsonify({"error": "Por favor informar uma senha valida."}), HTTPStatus.UNAUTHORIZED.value)
+
 			
 			obj_users = User.query.filter_by(email=email).first()
 
@@ -164,7 +167,7 @@ class ResetPassword(MethodView):
 			return make_response(jsonify({"error": "Usuario nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
 
 		obj_users.update({"password": password})
-		return make_response(jsonify({'msg': "TROCA FOI HEIM"}), HTTPStatus.OK.value)
+		return make_response(jsonify({'message': "TROCA FOI HEIM"}), HTTPStatus.OK.value)
 
 class GetRoleUser(MethodView):
 	"""
