@@ -81,15 +81,16 @@ class SignUpApi(MethodView):
 		response = dict(status="fail")
 
 		try:
-			post_data = request.get_json(force=True) 
+			post_data = request.get_json(force=True)
+			new_user_data = post_data.get("new_user_data")
+			new_user_data.update({"status_id": 3})
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 
 		try:
-			post_data.update({"status_id": 3})
-			data = user_schema.load(post_data)
+			data = user_schema.load(new_user_data)
 		except ValidationError as err:
 			print(err.messages)
 			print(err.valid_data)
