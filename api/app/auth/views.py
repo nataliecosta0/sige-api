@@ -24,6 +24,7 @@ class LoginApi(MethodView):
 		response = dict(status="fail")
 
 		try:
+			# import ipdb; ipdb.sset_trace()
 			post_data = request.get_json(force=True) 
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
