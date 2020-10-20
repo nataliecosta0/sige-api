@@ -179,6 +179,7 @@ class InternRecord(db.Model):
     residential_cep = db.Column(db.String(100), nullable=True)
     residential_phone_number = db.Column(db.String(45), nullable=True)
     phone_number = db.Column(db.String(45), nullable=True)
+    curse_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, data):
@@ -199,6 +200,7 @@ class InternRecord(db.Model):
         self.residential_cep = data.get('residential_cep')
         self.residential_phone_number = data.get('residential_phone_number')
         self.phone_number = data.get('phone_number')
+        self.curse_id = data.get('curse_id')
         self.user_id = data.get('user_id')
         #self.created_at = datetime.datetime.utcnow()
         #self.modified_at = datetime.datetime.utcnow()
@@ -222,6 +224,7 @@ class InternRecord(db.Model):
         self.residential_cep = data.get('residential_cep')
         self.residential_phone_number = data.get('residential_phone_number')
         self.phone_number = data.get('phone_number')
+        self.curse_id = data.get('curse_id')
         self.user_id = data.get('user_id')
         
         db.session.commit()
@@ -260,6 +263,7 @@ class InternSchema(Schema):
     residential_cep = fields.Str(required=False, allow_none=True)
     residential_phone_number = fields.Str(required=False, allow_none=True)
     phone_number = fields.Str(required=False, allow_none=True)
+    curse_id = fields.Int(required=True)
     user_id = fields.Int(required=True)
 
 class Company(db.Model):

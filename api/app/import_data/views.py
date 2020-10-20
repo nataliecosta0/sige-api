@@ -12,10 +12,16 @@ from app.helpers import decorator_check_user_status
 
 class Upload(MethodView):
 	decorators = [decorator_check_user_status, jwt_required]
-	def post(self):
+	def post(self, curse_id=None):
 		"""
  		Upload file
   		"""
+		try:
+			if not curse_id or not int(curse_id):
+				return make_response(jsonify({'error': 'Curso não identificado.'}), HTTPStatus.BAD_REQUEST.value) 
+		except ValueError as e:
+			return make_response(jsonify({'error': 'O curso id deve conter apenas numeros.'}), HTTPStatus.BAD_REQUEST.value) 
+		
 		try:
 			file_import = request.files.getlist('file')
 			path = f"/tmp/{datetime.datetime.timestamp}"
@@ -23,7 +29,7 @@ class Upload(MethodView):
 				extention = each_file.filename.split(".")[1]
 				each_file.save(f"{path}.{extention}")
 				try:
-					loadfile(f"{path}.{extention}")
+					loadfile(f"{path}.{extention}", curse_id)
 
 				except ValidationError as err:
 

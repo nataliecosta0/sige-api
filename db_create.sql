@@ -61,6 +61,7 @@ create table intern_record(
     residential_cep varchar(100) not null,
     residential_phone_number varchar(45),
     phone_number varchar(45),
+    curse_id integer not null,
     user_id integer REFERENCES users (id)
 );
 -- insert into intern_record (user_id) values (1);
