@@ -101,8 +101,6 @@ class Contract(MethodView):
 	decorators = [decorator_check_user_status, jwt_required]
 	def get(self, contract_id=None):
 		try:
-			import ipdb; ipdb.sset_trace()
-
 			if contract_id:
 				all_contract = Contracts.get_one_contract(contract_id)
 				dict_contracts = get_one_contrato(all_contract)
