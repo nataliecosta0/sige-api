@@ -1,6 +1,7 @@
 from flask import Blueprint
 from .views import (
-	LoginApi, SignUpApi, TestLogin, 
+	LoginApi, SignUpApi, 
+	# TestLogin, 
 	ResetPassword, GetRoleUser, 
 	BeginAccessRecovery,
 	VerifyAccessRecoveryCode
@@ -9,7 +10,7 @@ from .views import (
 
 login_view = LoginApi.as_view("login_api")
 sign_up_view = SignUpApi.as_view("sign_up_api")
-test_login_view = TestLogin.as_view("test_login")
+# test_login_view = TestLogin.as_view("test_login")
 reset_password_view = ResetPassword.as_view("reset_password")
 get_role_user_view = GetRoleUser.as_view("get_role_user")
 
