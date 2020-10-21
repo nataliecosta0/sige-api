@@ -29,17 +29,31 @@ def make_dict_contracts(record_contracts, sub_contr=None, simple=False):
 		else:
 			status = 0
 
+		subcontracts= [
+			{
+				"start_date": split_dates(start_date), 
+				"ending_date": split_dates(ending_date)
+		}]
+
 		dict_contracts= dict(
 			company_id=record_contracts.company_id,
 			intern_ra=record_contracts.intern_ra,
 			status=status,
-			start_date=start_date,
-			ending_date=ending_date
+			subcontracts=subcontracts,
 		)
 	else:
 		dict_contracts = {}
 		
 	return dict_contracts
+
+def split_dates(current_date):
+	if current_date:
+		current_date = current_date.split("T")
+		current_date = current_date[0] if current_date else ""
+	else:
+		current_date = ""
+
+	return current_date
 
 
 def validate_date(start_date, ending_date):
@@ -79,7 +93,7 @@ def get_all_contratos(record_contracts):
 
 def get_one_contrato(record_contracts):
 	last_sub_contr = get_last_contracts(record_contracts.id)
-	dict_contracts = dict(internship_contracts=make_dict_contracts(record_contracts, last_sub_contr))
+	dict_contracts = dict(internship_contract=make_dict_contracts(record_contracts, last_sub_contr))
 	return dict_contracts
 
 
@@ -107,7 +121,7 @@ class Contract(MethodView):
 		response = dict(status="fail")
 
 		try:
-			post_data = request.get_json(force=True) 
+			post_data = request.get_json(force=True)
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
 			status_code = HTTPStatus.BAD_REQUEST.value
@@ -116,8 +130,9 @@ class Contract(MethodView):
 		if contract_id:
 
 			try:
-				post_data.update({"internship_contract_id": int(contract_id)})
-				data = sub_contract_schema.load(post_data)
+				new_subcontract_data = post_data.get("new_subcontract_data")
+				new_subcontract_data.update({"internship_contract_id": int(contract_id)})
+				data = sub_contract_schema.load(new_subcontract_data)
 			except ValidationError as err:
 				print(err.messages)
 				print(err.valid_data)
@@ -132,7 +147,8 @@ class Contract(MethodView):
 		else:
 
 			try:
-				data = contracts_schema.load(post_data)
+				new_contract_data = post_data.get("new_contract_data")
+				data = contracts_schema.load(new_contract_data)
 			except ValidationError as err:
 				print(err.messages)
 				print(err.valid_data)
