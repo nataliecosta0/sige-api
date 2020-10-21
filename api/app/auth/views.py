@@ -119,7 +119,7 @@ class SignUpApi(MethodView):
 
 			# token = Auth.generate_token(user_id)
 
-			return make_response(jsonify({'msg': "Usuário criado com sucesso."}), HTTPStatus.OK.value)
+			return make_response(jsonify({'msg': "Usuário criado com sucesso. Aguarde a aprovação de acesso"}), HTTPStatus.OK.value)
 			#return make_response(jsonify(response), HTTPStatus.OK.value)
 		except:
 			return make_response(jsonify({"error": "Erro ao criar usuário"}), HTTPStatus.BAD_REQUEST.value)
