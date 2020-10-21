@@ -28,7 +28,7 @@ def make_dict_empresas(registro_empresa, simple=False):
             zip_code=registro_empresa.zip_code,
             address=registro_empresa.address,
             contact_phone=registro_empresa.contact_phone,
-            contact_person=registro_empresa.contact_person,
+            # contact_person=registro_empresa.contact_person,
             associated_since=registro_empresa.associated_since,
             associated_until=registro_empresa.associated_until,
         )
@@ -42,35 +42,46 @@ def get_all_empresas(registro_empresas):
 
 
 def get_one_empresa(registro_empresa):
-    dict_empresa = dict(associated_companies=make_dict_empresas(registro_empresa))
+    dict_empresa = dict(associated_company=make_dict_empresas(registro_empresa))
     return dict_empresa
 
 
 class Companies(MethodView):
 	decorators = [decorator_check_user_status, jwt_required]
-	def get(self):
+	def get(self, company_id=None):
 		try:
-			all_companies = Company.get_all_company()
-			dict_empresas = get_all_empresas(all_companies)
+			if company_id:
+				one_company = Company.get_one_id_company(company_id)
+				if not one_company:
+					return make_response(jsonify({"error": "Empresa nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
+				dict_empresas = get_one_empresa(one_company)
+
+			else:
+				all_companies = Company.get_all_company()
+				if not all_companies:
+					return make_response(jsonify({"error": "Empresa nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
+				dict_empresas = get_all_empresas(all_companies)
+
 			if dict_empresas:
 				return make_response(jsonify(dict_empresas), HTTPStatus.OK.value)
-			return make_response(jsonify({"error": "Empresa nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": "Empresa nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
 		except Exception as e:
-			return make_response(jsonify({"error": "Empresa nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": "Empresa nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
 	
 	def post(self):
 		
 		response = dict(status="fail")
 
 		try:
-			post_data = request.get_json(force=True) 
+			post_data = request.get_json(force=True)
+			new_company_data = post_data.get("new_company_data")
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
 			status_code = HTTPStatus.BAD_REQUEST.value
 			return make_response(jsonify(response), status_code)
 
 		try:
-			data = company_schema.load(post_data)
+			data = company_schema.load(new_company_data)
 		except ValidationError as err:
 			print(err.messages)
 			print(err.valid_data)

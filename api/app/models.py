@@ -313,8 +313,11 @@ class Company(db.Model):
 
     @staticmethod
     def get_one_company(value):
-        a = Company.query.filter_by(company_name=value).first()
         return Company.query.filter_by(company_name=value).first()
+    
+    @staticmethod
+    def get_one_id_company(value):
+        return Company.query.filter_by(id=value).first()
 
     @staticmethod
     def get_all_company():

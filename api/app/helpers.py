@@ -196,8 +196,8 @@ def custom_response(res, status_code):
 
 def save_in_intern_record(studants, curse_id):
 	all_studants = []
-	current_tk = get_jwt_identity()
-	current_id = current_tk.get('sub')
+	current_id = get_jwt_identity()
+	# current_id = current_tk.get('sub')
 	for studant in studants:
 		studant_register = {
 			'ra': int(studant.get('RA')),
