@@ -272,7 +272,7 @@ class Company(db.Model):
     ___tablename___ = "company"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    cnpj = db.Column(db.BigInteger, nullable=False)
+    cnpj = db.Column(db.String(45), nullable=False)
     company_name = db.Column(db.String(45), nullable=False)
     opening_date = db.Column(db.String(45), nullable=False)
     contact_email = db.Column(db.String(45), nullable=False)
@@ -326,7 +326,7 @@ class Company(db.Model):
 class CompanySchema(Schema):
 
     id = fields.Int(dump_only=True)
-    cnpj = fields.Int(required=True)
+    cnpj = fields.Str(required=True)
     company_name = fields.Str(required=True)
     opening_date = fields.Str(required=True)
     contact_email = fields.Email(required=True)

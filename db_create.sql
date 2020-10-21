@@ -76,9 +76,9 @@ create table password_recovery(
 
 create table company(
     id serial primary key,
-    cnpj bigint not null,
+    cnpj varchar(45) not null,
     company_name varchar(45) not null,
-    opening_date text not null,
+    opening_date varchar(100) not null,
     contact_email varchar(45) not null,
     zip_code varchar(100) not null,
     address varchar(100) not null,
