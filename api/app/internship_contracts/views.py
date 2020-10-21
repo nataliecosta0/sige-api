@@ -64,8 +64,6 @@ def validate_date(start_date, ending_date):
 		return False
 
 def get_last_contracts(contract_id):
-	import ipdb; ipdb.sset_trace()
-
 	sub_contracts = SubContracts.get_one_sub_contract(contract_id)
 	chosen = sub_contracts[0]
 	if chosen:
