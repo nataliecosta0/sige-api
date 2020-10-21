@@ -125,13 +125,13 @@ class SignUpApi(MethodView):
 			return make_response(jsonify({"error": "Erro ao criar usuário"}), HTTPStatus.BAD_REQUEST.value)
 
 
-class TestLogin(MethodView):
-	"""
-	docstring
-	"""
-	decorators = [master_required, decorator_check_user_status, jwt_required]
-	def get(self):
-		return make_response(jsonify({"msg": "LOGIN BOM"}), HTTPStatus.OK.value)
+# class TestLogin(MethodView):
+# 	"""
+# 	docstring
+# 	"""
+# 	decorators = [master_required, decorator_check_user_status, jwt_required]
+# 	def get(self):
+# 		return make_response(jsonify({"msg": "LOGIN BOM"}), HTTPStatus.OK.value)
 
 class ResetPassword(MethodView):
 	"""
@@ -167,7 +167,7 @@ class ResetPassword(MethodView):
 			return make_response(jsonify({"error": "Usuario nao encontrado"}), HTTPStatus.BAD_REQUEST.value)
 
 		obj_users.update({"password": password})
-		return make_response(jsonify({'message': "TROCA FOI HEIM"}), HTTPStatus.OK.value)
+		return make_response(jsonify({'message': "Senha atualizada."}), HTTPStatus.OK.value)
 
 class GetRoleUser(MethodView):
 	"""
@@ -185,7 +185,7 @@ class GetRoleUser(MethodView):
 			response = {"user" : {"role": current_permission.permission_id}}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
-			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({'message': 'Nenhum usuário encontrado'}), HTTPStatus.BAD_REQUEST.value)
 
 
 class BeginAccessRecovery(MethodView):
@@ -229,7 +229,7 @@ class BeginAccessRecovery(MethodView):
 		msg.sender = 'suporte.sigeapi@gmail.com' 
 		msg.body = msg_de_recovery.format(random_code=random_code)
 		status_ok = mail.send(msg)
-		return make_response(jsonify({'msg': "EMAIL FOI HEIM"}), HTTPStatus.OK.value)
+		return make_response(jsonify({'msg': "E-mail enviado."}), HTTPStatus.OK.value)
 
 class VerifyAccessRecoveryCode(MethodView):
 	"""
@@ -252,17 +252,17 @@ class VerifyAccessRecoveryCode(MethodView):
 
 			obj_users = User.query.filter_by(email=email).first()
 			if not obj_users:
-				return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+				return make_response(jsonify({'message': 'Nenhum usuário encontrado'}), HTTPStatus.BAD_REQUEST.value)
 			
 			user_code = PasswordRecovery.get_one_password_recovery(obj_users.id)
 			if not user_code:
-				return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+				return make_response(jsonify({'message': 'Nenhum usuário encontrado'}), HTTPStatus.BAD_REQUEST.value)
 			if user_code.code_id != code_id:
-				return make_response(jsonify({'message': 'Codigo incorreto'}), HTTPStatus.BAD_REQUEST.value)
+				return make_response(jsonify({'message': 'Código incorreto'}), HTTPStatus.BAD_REQUEST.value)
 			user_code.delete()
-			return make_response(jsonify({'msg': "PASSWORD FOI HEIM"}), HTTPStatus.OK.value)
+			return make_response(jsonify({'msg': "Código validado."}), HTTPStatus.OK.value)
 		except Exception as e:
-			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({'message': 'Nenhum usuário encontrado'}), HTTPStatus.BAD_REQUEST.value)
 # class GetRoleUser(MethodView):
 # 	decorators = [master_required, decorator_check_user_status, jwt_required]
 # 	def get(self):

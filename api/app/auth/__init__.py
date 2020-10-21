@@ -20,7 +20,7 @@ verify_access_recovery_code_view = VerifyAccessRecoveryCode.as_view("verify_acce
 auth_views = (
 	("/v1/auth/authenticate", login_view, ["POST"]),
 	("/v1/auth/sign_up", sign_up_view, ["POST"]),
-	("/v1/auth/test_login", test_login_view, ["GET"]),
+	# ("/v1/auth/test_login", test_login_view, ["GET"]),
 	("/v1/auth/reset_password", reset_password_view, ["POST"]),
 	("/v1/auth/user", get_role_user_view, ["GET"]),
 	("/v1/auth/begin_access_recovery", begin_access_recovery_view, ["POST"]),
