@@ -20,12 +20,12 @@ def make_dict_empresas(registro_empresa, simple=False):
             id=registro_empresa.id,
         )
     else:
-        date_since, date_until = get_dates(registro_empresa)
+        date_opening, date_since, date_until = split_dates(registro_empresa)
 
         dict_empresa = dict(
             cnpj=registro_empresa.cnpj,
             company_name=registro_empresa.company_name,
-            opening_date=registro_empresa.opening_date,
+            opening_date=date_opening,
             contact_email=registro_empresa.contact_email,
             zip_code=registro_empresa.zip_code,
             address=registro_empresa.address,
@@ -36,7 +36,14 @@ def make_dict_empresas(registro_empresa, simple=False):
         )
     return dict_empresa
 
-def get_dates(registro_empresa):
+def split_dates(registro_empresa):
+	opening_date = registro_empresa.opening_date
+	if opening_date:
+		date_opening = opening_date.split("T")
+		date_opening = date_opening[0] if date_opening else ""
+	else:
+		date_opening = ""
+
 	associated_since = registro_empresa.associated_since
 	if associated_since:
 		date_since = associated_since.split("T")
@@ -50,7 +57,8 @@ def get_dates(registro_empresa):
 		date_until = date_until[0] if date_since else ""
 	else:
 		date_until = ""
-	return date_since, date_until
+
+	return date_opening, date_since, date_until
 
 
 def get_all_empresas(registro_empresas):
