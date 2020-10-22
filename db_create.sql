@@ -91,7 +91,7 @@ create table company(
 create table contracts(
     id serial primary key,
     company_id integer REFERENCES company (id),
-    intern_ra integer REFERENCES intern_record (ra),
+    intern_ra bigint REFERENCES intern_record (ra),
     has_become_effective integer,
     has_switched_companies integer
 );

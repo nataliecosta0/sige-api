@@ -344,7 +344,7 @@ class Contracts(db.Model):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
-    intern_ra = db.Column(db.Integer, db.ForeignKey('intern_record.ra'))
+    intern_ra = db.Column(db.BigInteger, db.ForeignKey('intern_record.ra'))
     has_become_effective = db.Column(db.Integer, nullable=True)
     has_switched_companies = db.Column(db.Integer, nullable=True)
 
