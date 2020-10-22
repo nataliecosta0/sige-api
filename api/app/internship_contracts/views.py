@@ -100,17 +100,17 @@ class Contract(MethodView):
 	def get(self, contract_id=None):
 		try:
 			if contract_id:
-				all_contract = Contracts.get_one_contract(contract_id)
-				dict_contracts = get_one_contrato(all_contract)
+				one_contract = Contracts.get_one_contract(contract_id)
+				dict_contracts = get_one_contrato(one_contract)
 			else:
 				all_contracts = Contracts.get_all_contracts()
 				dict_contracts = get_all_contratos(all_contracts)
 
 			if dict_contracts:
 				return make_response(jsonify(dict_contracts), HTTPStatus.OK.value)
-			return make_response(jsonify({"error": "Contrato não encontrado"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": str(one_contract.id)}), HTTPStatus.BAD_REQUEST.value)
 		except Exception as e:
-			return make_response(jsonify({"error": "Contrato não encontrado"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": str(e)}), HTTPStatus.BAD_REQUEST.value)
 	
 	def post(self, contract_id=None):
 
