@@ -25,8 +25,8 @@ def master_required(func):
 	"""
 	def wrapper(*args, **kwargs):
 		try:
-			current_id = get_jwt_identity()
-			# current_id = current_tk.get('sub')
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
 			user_permition = UserPermission.get_one_permission(current_id)
 			if user_permition.permission_id == 2:
 				return func(*args, **kwargs)
@@ -47,8 +47,8 @@ def decorator_check_user_status(func):
 	"""
 	def wrapper(*args, **kwargs):
 		try:
-			current_id = get_jwt_identity()
-			# current_id = current_tk.get('sub')
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
 			current_user = User.get_one_user(current_id)
 			user_status = current_user.status_id
 			if user_status == 1:
@@ -196,8 +196,8 @@ def custom_response(res, status_code):
 
 def save_in_intern_record(studants, curse_id):
 	all_studants = []
-	current_id = get_jwt_identity()
-	# current_id = current_tk.get('sub')
+	current_tk = get_jwt_identity()
+	current_id = current_tk.get('sub')
 	for studant in studants:
 		studant_register = {
 			'ra': int(studant.get('RA')),

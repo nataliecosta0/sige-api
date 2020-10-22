@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mongoengine import MongoEngine
 from flask_mail import Mail
 from flask_cors import CORS
-from app.config import BaseConfig
+from config import BaseConfig
 
 
 base_config = BaseConfig()
@@ -70,5 +70,5 @@ def create_app(config=app_settings):
 
 app = create_app()
 
-# if __name__ == "__main__":
-# 	app.run(debug=True,  host='0.0.0.0')
+if __name__ == "__main__":
+	app.run(debug=True,  host='0.0.0.0')

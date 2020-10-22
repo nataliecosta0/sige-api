@@ -136,7 +136,7 @@ class ResetPassword(MethodView):
 	"""
 	docstring
 	"""
-	decorators = []
+	decorators = [decorator_check_user_status, jwt_required]
 	def post(self):
 		response = dict(status="fail")
 		try:
@@ -178,8 +178,8 @@ class GetRoleUser(MethodView):
 		Retorna a permissao do usuario. 
 		"""
 		try:
-			current_id = get_jwt_identity()
-			# current_id = current_tk.get('sub')
+			current_tk = get_jwt_identity()
+			current_id = current_tk.get('sub')
 			current_permission = UserPermission.get_one_permission(current_id)
 			response = {"user" : {"role": current_permission.permission_id}}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
@@ -255,11 +255,20 @@ class VerifyAccessRecoveryCode(MethodView):
 			
 			user_code = PasswordRecovery.get_one_password_recovery(obj_users.id)
 			if not user_code:
-				return make_response(jsonify({'message': 'Nenhum usuário encontrado'}), HTTPStatus.BAD_REQUEST.value)
+				return make_response(jsonify({'message': 'Código nâo encontrado'}), HTTPStatus.BAD_REQUEST.value)
 			if user_code.code_id != code_id:
 				return make_response(jsonify({'message': 'Código incorreto'}), HTTPStatus.BAD_REQUEST.value)
-			user_code.delete()
-			return make_response(jsonify({'msg': "Código validado."}), HTTPStatus.OK.value)
+			else:
+				user_code.delete()
+
+				user_id = obj_users.id
+				token = auth.generate_token(user_id)
+				data_response = {
+					"status": HTTPStatus.OK.value,
+					"token": token
+				}
+			return custom_response(data_response, HTTPStatus.OK.value) 
+			# return make_response(jsonify({'msg': "Código validado."}), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuário encontrado'}), HTTPStatus.BAD_REQUEST.value)
 # class GetRoleUser(MethodView):
