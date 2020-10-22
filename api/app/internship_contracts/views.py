@@ -57,26 +57,31 @@ def split_dates(current_date):
 
 
 def validate_date(start_date, ending_date):
+	start = parser.parse(start_date).replace(tzinfo=None)
+	ending = parser.parse(ending_date).replace(tzinfo=None)
 	current_data = datetime.utcnow()
-	if all([current_data > parser.parse(start_date), current_data < parser.parse(ending_date)]):
+	if all([current_data > start, current_data < ending]):
 		return True
 	else:
 		return False
 
 def get_last_contracts(contract_id):
 	sub_contracts = SubContracts.get_one_sub_contract(contract_id)
-	chosen = sub_contracts[0]
-	if chosen:
-		chosen_date = parser.parse(chosen.ending_date)
-		for sub_contract in sub_contracts:
-			current_date = parser.parse(sub_contract.ending_date)
-			if current_date > chosen_date:
-				chosen = sub_contract
-				chosen_date = current_date
+	if isinstance(sub_contracts, list):
+		chosen = sub_contracts[0]
+		if chosen:
+			chosen_date = parser.parse(chosen.ending_date)
+			for sub_contract in sub_contracts:
+				current_date = parser.parse(sub_contract.ending_date)
+				if current_date > chosen_date:
+					chosen = sub_contract
+					chosen_date = current_date
+	elif sub_contracts:
+		chosen = sub_contracts
+	else:
+		return False
 
-		return chosen
-
-	return False
+	return chosen
 
 
 def get_all_contratos(record_contracts):
