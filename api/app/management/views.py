@@ -21,11 +21,12 @@ class DeleteUser(MethodView):
 				return make_response(jsonify({'message': 'Não é possivel deletar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
 			user = User.get_one_user(user_id)
-			permission = UserPermission.get_one_permission(user_id)
-			if not all([user or permission]):
+			# permission = UserPermission.get_one_permission(user_id)
+			if not all([user]):
 				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
-			permission.delete()
-			user.delete()
+			user.update({"status_id": 2})
+			# permission.delete()
+			# user.delete()
 			return make_response(jsonify({'message': 'deleted'}), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)

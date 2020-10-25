@@ -257,7 +257,7 @@ class VerifyAccessRecoveryCode(MethodView):
 			if not user_code:
 				return make_response(jsonify({'message': 'Código nâo encontrado'}), HTTPStatus.BAD_REQUEST.value)
 			if int(user_code.code_id) != int(code_id):
-				return make_response(jsonify({'message': f'Código incorreto {user_code.code_id} e {code_id}'}), HTTPStatus.BAD_REQUEST.value)
+				return make_response(jsonify({'message': f'Código incorreto.'}), HTTPStatus.BAD_REQUEST.value)
 			else:
 				user_code.delete()
 
