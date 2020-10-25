@@ -81,13 +81,12 @@ class RoleUser(MethodView):
 		"""
  		Altera o nivel do usuario.
   		"""
+		response = dict(status="fail")
 		try:
 			current_id = get_jwt_identity()
 			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel alterar a permissao desse usuario'}), HTTPStatus.BAD_REQUEST.value) 
-
-			response = dict(status="fail")
 
 			post_data = request.get_json(force=True) 
 		except BadRequest:

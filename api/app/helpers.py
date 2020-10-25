@@ -225,19 +225,23 @@ def make_dict_contracts(record_contracts, sub_contr=None, simple=False):
 			company_id=record_contracts.company_id,
 			intern_ra=record_contracts.intern_ra
 		)
-	elif not simple and sub_contr:
-		start_date = sub_contr.start_date
-		ending_date = sub_contr.ending_date
-		if validate_date(start_date, ending_date):
-			status = 1
+	elif not simple:
+		if sub_contr:
+			start_date = sub_contr.start_date
+			ending_date = sub_contr.ending_date
+			if validate_date(start_date, ending_date):
+				status = 1
+			else:
+				status = 0
+
+			subcontracts = [
+				{
+					"start_date": split_dates(start_date), 
+					"ending_date": split_dates(ending_date)
+			}]
 		else:
 			status = 0
-
-		subcontracts = [
-			{
-				"start_date": split_dates(start_date), 
-				"ending_date": split_dates(ending_date)
-		}]
+			subcontracts = []
 
 		dict_contracts= dict(
 			company_id=record_contracts.company_id,
@@ -290,6 +294,9 @@ def validate_date(start_date, ending_date):
 def get_last_contracts(contract_id):
 	sub_contracts = SubContracts.get_one_sub_contract(contract_id)
 	if isinstance(sub_contracts, list):
+		if not sub_contracts:
+			return False
+
 		chosen = sub_contracts[0]
 		if chosen:
 			chosen_date = parser.parse(chosen.ending_date)
@@ -307,11 +314,9 @@ def get_last_contracts(contract_id):
 
 
 def interns_by_companies():
-	# [{"company_name": nome, "interns_count": 1}]
 	all_interns_count = []
-	import ipdb; ipdb.sset_trace()
 	all_companies = Company.get_all_company()
-	if not all_companies or isinstance(all_companies, list):
+	if not all_companies or not isinstance(all_companies, list):
 		return None
 	for each_company in all_companies:
 		interns_count = 0
@@ -322,11 +327,12 @@ def interns_by_companies():
 			dict_company.update({"interns_count": interns_count})
 			all_interns_count.append(dict_company)
 			continue
-		
+
 		for each_contract in  contracts:
 			dict_contract = get_one_contract_helper(each_contract)
-			if dict_contract.get("status"):
+			if dict_contract.get("internship_contract", {}).get("status"):
 				interns_count += 1
 		dict_company.update({"interns_count": interns_count})
 		all_interns_count.append(dict_company)
+	return all_interns_count
 
