@@ -34,7 +34,7 @@ def make_dict(registro_aluno, simple=False):
 
 def get_all_alunos(registro_alunos):
     list_alunos = [make_dict(each, simple=True) for each in registro_alunos]
-    dict_alunos = dict(intern_record=list_alunos)
+    dict_alunos = dict(intern_records=list_alunos)
     return dict_alunos
 
 

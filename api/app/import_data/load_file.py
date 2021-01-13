@@ -5,7 +5,7 @@ from pprint import pprint
 from app.helpers import save_in_intern_record
 
 
-def loadfile(path):
+def loadfile(path, curse_id):
     book = open_workbook(path, on_demand=True)
     alunos = []
     for name in book.sheet_names():
@@ -24,6 +24,6 @@ def loadfile(path):
                     cell_info = cell_info.strip()
                 aluno.update({col_name: cell_info})
             alunos.append(aluno)
-    save_in_intern_record(alunos)
+    save_in_intern_record(alunos, curse_id)
 
     # return alunos

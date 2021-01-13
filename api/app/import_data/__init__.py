@@ -5,7 +5,7 @@ from .views import (Upload)
 upload_view = Upload.as_view("upload_file")
 
 import_data_views = (
-	("/v1/import_data/upload", upload_view, ["POST"]),
+	("/v1/import_data/upload/<curse_id>", upload_view, ["POST"]),
 )
 
 import_data_blueprint = Blueprint("import_data", __name__)

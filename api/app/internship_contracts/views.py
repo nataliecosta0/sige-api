@@ -29,42 +29,59 @@ def make_dict_contracts(record_contracts, sub_contr=None, simple=False):
 		else:
 			status = 0
 
+		subcontracts= [
+			{
+				"start_date": split_dates(start_date), 
+				"ending_date": split_dates(ending_date)
+		}]
+
 		dict_contracts= dict(
 			company_id=record_contracts.company_id,
 			intern_ra=record_contracts.intern_ra,
 			status=status,
-			start_date=start_date,
-			ending_date=ending_date
+			subcontracts=subcontracts,
 		)
 	else:
 		dict_contracts = {}
 		
 	return dict_contracts
 
+def split_dates(current_date):
+	if current_date:
+		current_date = current_date.split("T")
+		current_date = current_date[0] if current_date else ""
+	else:
+		current_date = ""
+
+	return current_date
+
 
 def validate_date(start_date, ending_date):
+	start = parser.parse(start_date).replace(tzinfo=None)
+	ending = parser.parse(ending_date).replace(tzinfo=None)
 	current_data = datetime.utcnow()
-	if all([current_data > parser.parse(start_date), current_data < parser.parse(ending_date)]):
+	if all([current_data > start, current_data < ending]):
 		return True
 	else:
 		return False
 
 def get_last_contracts(contract_id):
-	import ipdb; ipdb.sset_trace()
-
 	sub_contracts = SubContracts.get_one_sub_contract(contract_id)
-	chosen = sub_contracts[0]
-	if chosen:
-		chosen_date = parser.parse(chosen.ending_date)
-		for sub_contract in sub_contracts:
-			current_date = parser.parse(sub_contract.ending_date)
-			if current_date > chosen_date:
-				chosen = sub_contract
-				chosen_date = current_date
+	if isinstance(sub_contracts, list):
+		chosen = sub_contracts[0]
+		if chosen:
+			chosen_date = parser.parse(chosen.ending_date)
+			for sub_contract in sub_contracts:
+				current_date = parser.parse(sub_contract.ending_date)
+				if current_date > chosen_date:
+					chosen = sub_contract
+					chosen_date = current_date
+	elif sub_contracts:
+		chosen = sub_contracts
+	else:
+		return False
 
-		return chosen
-
-	return False
+	return chosen
 
 
 def get_all_contratos(record_contracts):
@@ -79,7 +96,7 @@ def get_all_contratos(record_contracts):
 
 def get_one_contrato(record_contracts):
 	last_sub_contr = get_last_contracts(record_contracts.id)
-	dict_contracts = dict(internship_contracts=make_dict_contracts(record_contracts, last_sub_contr))
+	dict_contracts = dict(internship_contract=make_dict_contracts(record_contracts, last_sub_contr))
 	return dict_contracts
 
 
@@ -87,27 +104,25 @@ class Contract(MethodView):
 	decorators = [decorator_check_user_status, jwt_required]
 	def get(self, contract_id=None):
 		try:
-			import ipdb; ipdb.sset_trace()
-
 			if contract_id:
-				all_contract = Contracts.get_one_contract(contract_id)
-				dict_contracts = get_one_contrato(all_contract)
+				one_contract = Contracts.get_one_contract(contract_id)
+				dict_contracts = get_one_contrato(one_contract)
 			else:
 				all_contracts = Contracts.get_all_contracts()
 				dict_contracts = get_all_contratos(all_contracts)
 
 			if dict_contracts:
 				return make_response(jsonify(dict_contracts), HTTPStatus.OK.value)
-			return make_response(jsonify({"error": "Contrato não encontrado"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": str(one_contract.id)}), HTTPStatus.BAD_REQUEST.value)
 		except Exception as e:
-			return make_response(jsonify({"error": "Contrato não encontrado"}), HTTPStatus.BAD_REQUEST.value)
+			return make_response(jsonify({"error": str(e)}), HTTPStatus.BAD_REQUEST.value)
 	
 	def post(self, contract_id=None):
 
 		response = dict(status="fail")
 
 		try:
-			post_data = request.get_json(force=True) 
+			post_data = request.get_json(force=True)
 		except BadRequest:
 			response.update(dict(message="O dado informado não foi aceito"))
 			status_code = HTTPStatus.BAD_REQUEST.value
@@ -116,8 +131,9 @@ class Contract(MethodView):
 		if contract_id:
 
 			try:
-				post_data.update({"internship_contract_id": int(contract_id)})
-				data = sub_contract_schema.load(post_data)
+				new_subcontract_data = post_data.get("new_subcontract_data")
+				new_subcontract_data.update({"internship_contract_id": int(contract_id)})
+				data = sub_contract_schema.load(new_subcontract_data)
 			except ValidationError as err:
 				print(err.messages)
 				print(err.valid_data)
@@ -132,7 +148,8 @@ class Contract(MethodView):
 		else:
 
 			try:
-				data = contracts_schema.load(post_data)
+				new_contract_data = post_data.get("new_contract_data")
+				data = contracts_schema.load(new_contract_data)
 			except ValidationError as err:
 				print(err.messages)
 				print(err.valid_data)

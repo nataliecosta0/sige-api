@@ -1,10 +1,16 @@
+# import os
+# import sys
+# os.chdir(sys.path[0])
+# os.chdir('../')
+
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_mongoengine import MongoEngine
 from flask_mail import Mail
-from config import BaseConfig
+from flask_cors import CORS
+from app.config import BaseConfig
 
 
 base_config = BaseConfig()
@@ -16,6 +22,7 @@ bcrypt = Bcrypt()
 jwt = JWTManager()
 db = SQLAlchemy()
 mail = Mail()
+cors = CORS()
 
 
 def create_app(config=app_settings):
@@ -29,9 +36,10 @@ def create_app(config=app_settings):
 	this_app.config['SQLALCHEMY_DATABASE_URI']=postgres_uri
 	db.init_app(this_app)
 	
-
 	#from app.auth.helpers import jwt
 	jwt.init_app(this_app)
+
+	cors.init_app(this_app)
 
 	from app.auth import auth_blueprint
 	this_app.register_blueprint(auth_blueprint)
@@ -62,5 +70,5 @@ def create_app(config=app_settings):
 
 app = create_app()
 
-if __name__ == "__main__":
-	app.run(debug=True)
+# if __name__ == "__main__":
+# 	app.run(debug=True,  host='0.0.0.0')

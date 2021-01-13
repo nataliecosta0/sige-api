@@ -15,8 +15,8 @@ class DeleteUser(MethodView):
  		Delete a user
   		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel deletar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
@@ -38,8 +38,8 @@ class DisableUser(MethodView):
  		Disable a user
   		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel desativar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
@@ -47,10 +47,10 @@ class DisableUser(MethodView):
 			user = User.get_one_user(user_id)
 			if not user:
 				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
-			if user.status_id ==  2:
-				return make_response(jsonify({'message': 'O usuario ja esta inativo.'}), HTTPStatus.BAD_REQUEST.value) 
+			if user.status_id ==  3:
+				return make_response(jsonify({'message': 'O usuario ja esta pendente de ativacao.'}), HTTPStatus.BAD_REQUEST.value) 
 
-			user.update({"status_id": 2})
+			user.update({"status_id": 3})
 			return make_response(jsonify({'message': 'Usuario desativado com sucesso.'}), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)
@@ -82,8 +82,8 @@ class RoleUser(MethodView):
  		Altera o nivel do usuario.
   		"""
 		try:
-			current_tk = get_jwt_identity()
-			current_id = current_tk.get('sub')
+			current_id = get_jwt_identity()
+			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel alterar a permissao desse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
@@ -118,7 +118,11 @@ class GetEnableUsers(MethodView):
 		"""
 		try:
 			active_users = User.get_status_user(status=1)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in active_users]}
+			response = {"users" : [{
+							"id": each_user.id, "name": each_user.name, "email": each_user.email} 
+							for each_user in active_users
+							]
+						}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
@@ -132,7 +136,11 @@ class GetDisableUsers(MethodView):
 		"""
 		try:
 			disable_users = User.get_status_user(status=2)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in disable_users]}
+			response = {"users" : [{
+				"id": each_user.id, "name": each_user.name, "email": each_user.email} 
+				for each_user in disable_users
+				]
+			}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)
@@ -146,7 +154,12 @@ class GetPendingUsers(MethodView):
 		"""
 		try:
 			pending_users = User.get_status_user(status=3)
-			response = {"users" : [f"{each_user.id} - {each_user.name}" for each_user in pending_users]}
+			
+			response = {"users" : [{
+				"id": each_user.id, "name": each_user.name, "email": each_user.email} 
+				for each_user in pending_users
+				]
+			}
 			return make_response(jsonify(response), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'Nenhum usuario encontrado'}), HTTPStatus.BAD_REQUEST.value)

@@ -6,7 +6,7 @@ contracts_view = Contract.as_view("contracts")
 
 internship_contracts_views = (
 	("/v1/internship_contracts/contracts/<contract_id>", contracts_view, ["GET", "POST"]),
-	("/v1/internship_contracts/contracts/", contracts_view, ["GET", "POST"]),
+	# ("/v1/internship_contracts/contracts/", contracts_view, ["GET", "POST"]),
 	("/v1/internship_contracts/contracts", contracts_view, ["GET", "POST"]),
 
 )

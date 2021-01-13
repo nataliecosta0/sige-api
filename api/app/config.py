@@ -37,7 +37,7 @@ class BaseConfig:
     DEBUG = False
 
     # flask_jwt configuration.
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=120)
     JWT_BLACKLIST_ENABLED = False # TODO: Implementar blacklist token 
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=1)
@@ -52,6 +52,8 @@ class BaseConfig:
     MAIL_PORT = MAIL_PORT
     MAIL_USERNAME = MAIL_USERNAME
     MAIL_PASSWORD = MAIL_PASSWORD
+
+    blacklist = set()
 
 
 class DevelopmentConfig(BaseConfig):

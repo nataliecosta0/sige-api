@@ -179,6 +179,7 @@ class InternRecord(db.Model):
     residential_cep = db.Column(db.String(100), nullable=True)
     residential_phone_number = db.Column(db.String(45), nullable=True)
     phone_number = db.Column(db.String(45), nullable=True)
+    curse_id = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     def __init__(self, data):
@@ -199,6 +200,7 @@ class InternRecord(db.Model):
         self.residential_cep = data.get('residential_cep')
         self.residential_phone_number = data.get('residential_phone_number')
         self.phone_number = data.get('phone_number')
+        self.curse_id = data.get('curse_id')
         self.user_id = data.get('user_id')
         #self.created_at = datetime.datetime.utcnow()
         #self.modified_at = datetime.datetime.utcnow()
@@ -222,6 +224,7 @@ class InternRecord(db.Model):
         self.residential_cep = data.get('residential_cep')
         self.residential_phone_number = data.get('residential_phone_number')
         self.phone_number = data.get('phone_number')
+        self.curse_id = data.get('curse_id')
         self.user_id = data.get('user_id')
         
         db.session.commit()
@@ -260,6 +263,7 @@ class InternSchema(Schema):
     residential_cep = fields.Str(required=False, allow_none=True)
     residential_phone_number = fields.Str(required=False, allow_none=True)
     phone_number = fields.Str(required=False, allow_none=True)
+    curse_id = fields.Int(required=True)
     user_id = fields.Int(required=True)
 
 class Company(db.Model):
@@ -268,7 +272,7 @@ class Company(db.Model):
     ___tablename___ = "company"
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
-    cnpj = db.Column(db.BigInteger, nullable=False)
+    cnpj = db.Column(db.String(45), nullable=False)
     company_name = db.Column(db.String(45), nullable=False)
     opening_date = db.Column(db.String(45), nullable=False)
     contact_email = db.Column(db.String(45), nullable=False)
@@ -309,8 +313,11 @@ class Company(db.Model):
 
     @staticmethod
     def get_one_company(value):
-        a = Company.query.filter_by(company_name=value).first()
         return Company.query.filter_by(company_name=value).first()
+    
+    @staticmethod
+    def get_one_id_company(value):
+        return Company.query.filter_by(id=value).first()
 
     @staticmethod
     def get_all_company():
@@ -319,7 +326,7 @@ class Company(db.Model):
 class CompanySchema(Schema):
 
     id = fields.Int(dump_only=True)
-    cnpj = fields.Int(required=True)
+    cnpj = fields.Str(required=True)
     company_name = fields.Str(required=True)
     opening_date = fields.Str(required=True)
     contact_email = fields.Email(required=True)
@@ -337,7 +344,7 @@ class Contracts(db.Model):
     __table_args__ = {'extend_existing': True}
     id = db.Column(db.Integer, primary_key=True)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'))
-    intern_ra = db.Column(db.Integer, db.ForeignKey('intern_record.ra'))
+    intern_ra = db.Column(db.BigInteger, db.ForeignKey('intern_record.ra'))
     has_become_effective = db.Column(db.Integer, nullable=True)
     has_switched_companies = db.Column(db.Integer, nullable=True)
 
