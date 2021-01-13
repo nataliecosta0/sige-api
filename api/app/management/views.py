@@ -21,11 +21,12 @@ class DeleteUser(MethodView):
 				return make_response(jsonify({'message': 'Não é possivel deletar esse usuario'}), HTTPStatus.BAD_REQUEST.value) 
 
 			user = User.get_one_user(user_id)
-			permission = UserPermission.get_one_permission(user_id)
-			if not all([user or permission]):
+			# permission = UserPermission.get_one_permission(user_id)
+			if not all([user]):
 				return make_response(jsonify({'message': 'id nao tem'}), HTTPStatus.BAD_REQUEST.value) 
-			permission.delete()
-			user.delete()
+			user.update({"status_id": 2})
+			# permission.delete()
+			# user.delete()
 			return make_response(jsonify({'message': 'deleted'}), HTTPStatus.OK.value)
 		except Exception as e:
 			return make_response(jsonify({'message': 'precisa de um parametro inteiro'}), HTTPStatus.BAD_REQUEST.value)
@@ -81,13 +82,12 @@ class RoleUser(MethodView):
 		"""
  		Altera o nivel do usuario.
   		"""
+		response = dict(status="fail")
 		try:
 			current_id = get_jwt_identity()
 			# current_id = current_tk.get('sub')
 			if current_id == int(user_id):
 				return make_response(jsonify({'message': 'Não é possivel alterar a permissao desse usuario'}), HTTPStatus.BAD_REQUEST.value) 
-
-			response = dict(status="fail")
 
 			post_data = request.get_json(force=True) 
 		except BadRequest:

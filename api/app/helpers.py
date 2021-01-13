@@ -1,19 +1,25 @@
-from app import jwt as jwt_app
-import os
-import datetime
-from flask import json, Response, request, g, jsonify, make_response
-from functools import wraps
-from app.config import BaseConfig
-import jwt
-from flask_jwt_extended import create_access_token, get_jwt_identity
+from datetime import datetime, timedelta
 
-from app.models import User, UserPermission, InternRecord, InternSchema
+from dateutil import parser
+from flask import json, Response, jsonify, make_response
+from flask_jwt_extended import create_access_token, get_jwt_identity
 from http import HTTPStatus
+
+from app import jwt as jwt_app
+from app.config import BaseConfig
+from app.models import (
+	User, 
+	UserPermission, 
+	InternRecord, 
+	InternSchema, 
+	Contracts, 
+	SubContracts, 
+	Company
+)
 
 
 intern_schema = InternSchema(many=True)
 JWT_SECRET_KEY = BaseConfig().JWT_SECRET_KEY
-
 blacklist = BaseConfig().blacklist
 
 
@@ -79,18 +85,11 @@ def check_user_status(user_status) -> (None):
 		return make_response(jsonify({"error": "Permissao nao encontrada"}), HTTPStatus.BAD_REQUEST.value)
 	
 
-# @jwt_app.token_in_blacklist_loader
-# def check_token_in_blacklist(token):
-# 	"""
-# 	docstring
-# 	"""
-# 	jti = token['jti']
-# 	return TokenBlacklist.check_blacklist(token_id=jti)
-
 @jwt_app.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
     return jti in blacklist
+
 
 @jwt_app.user_loader_callback_loader
 def load_user_on_login(identity):
@@ -100,12 +99,14 @@ def load_user_on_login(identity):
 	else:
 		return None
 
+
 @jwt_app.user_identity_loader
 def user_identity_lookup(user):
 	"""
 	docstring
 	"""
 	return user.get("sub")
+
 
 class Auth():
 	"""
@@ -118,8 +119,8 @@ class Auth():
 		"""
 		try:
 			payload = {
-				'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1),
-				'iat': datetime.datetime.utcnow(),
+				'exp': datetime.utcnow() + timedelta(days=1),
+				'iat': datetime.utcnow(),
 				'sub': user_id
   			}
 			return create_access_token(payload)
@@ -131,57 +132,6 @@ class Auth():
 				status=400
 				)
 
-	# @staticmethod
-	# def decode_token(token):
-	# 	"""
-	# 	Decode token method
-	# 	"""
-	# 	re = {'data': {}, 'error': {}}
-	# 	try:
-  	# 		payload = jwt.decode(token, JWT_SECRET_KEY)
-  	# 		re['data'] = {'user_id': payload['sub']}
-  	# 		return re
-	# 	except jwt.ExpiredSignatureError as e1:
-  	# 		re['error'] = {'message': 'token expired, please login again'}
-  	# 		return re
-	# 	except jwt.InvalidTokenError:
-  	# 		re['error'] = {'message': 'Invalid token, please try again with a new token'}
-  	# 		return re
-
-
-	# decorator
-	# @staticmethod
-	# def auth_required(func):
-	# 	"""
-	# 	Auth decorator
-	# 	"""
-	# 	@wraps(func)
-	# 	def decorated_auth(*args, **kwargs):
-	# 		if 'api-token' not in request.headers:
-	# 			return Response(
-	# 				mimetype="application/json",
-	# 				response=json.dumps({'error': 'Authentication token is not available, please login to get one'}),
-	# 				status=400
-	# 			)
-	# 		token = request.headers.get('api-token')
-	# 		data = Auth.decode_token(token)
-	# 		if data['error']:
-	# 			return Response(
-	# 				mimetype="application/json",
-	# 				response=json.dumps(data['error']),
-	# 				status=400
-	# 			)
-	# 		user_id = data['data']['user_id']
-	# 		check_user = User.get_one_user(user_id)
-	# 		if not check_user:
-	# 			return Response(
-	# 				mimetype="application/json",
-  	# 				response=json.dumps({'error': 'user does not exist, invalid token'}),
-  	# 				status=400
-	# 			)
-	# 		g.user = {'id': user_id}
-	# 		return func(*args, **kwargs)
-	# 	return decorated_auth
 
 def custom_response(res, status_code):
   		"""
@@ -228,3 +178,161 @@ def save_in_intern_record(studants, curse_id):
 			student_by_ra.update(studant_data)
 		else:
 			records.save()
+
+
+def make_dict_studants(registro_aluno, simple=False):
+    if simple:
+        dict_aluno = dict(
+            ra=registro_aluno.ra,
+            name=registro_aluno.name,
+            course_name=registro_aluno.course_name,
+        )
+    else:
+        dict_aluno = dict(
+            ra=registro_aluno.ra,
+            name=registro_aluno.name,
+            birth_date=registro_aluno.birth_date,
+            mother_name=registro_aluno.mother_name,
+            spouse_name=registro_aluno.spouse_name,
+            course_name=registro_aluno.course_name,
+            period=registro_aluno.period,
+            email=registro_aluno.email,
+            residential_address=registro_aluno.residential_address,
+            residential_city=registro_aluno.residential_city,
+            residential_neighbourhood=registro_aluno.residential_neighbourhood,
+            residential_cep=registro_aluno.residential_cep,
+            residential_phone_number=registro_aluno.residential_phone_number,
+            phone_number=registro_aluno.phone_number,
+        )
+    return dict_aluno
+
+
+def get_all_studants_helper(registro_alunos):
+    list_alunos = [make_dict_studants(each, simple=True) for each in registro_alunos]
+    dict_alunos = dict(intern_records=list_alunos)
+    return dict_alunos
+
+
+def get_one_studant_helper(registro_aluno):
+    dict_aluno = dict(intern_record=make_dict_studants(registro_aluno))
+    return dict_aluno
+
+
+def make_dict_contracts(record_contracts, sub_contr=None, simple=False):
+	if simple:
+		dict_contracts = dict(
+			id=record_contracts.id,
+			company_id=record_contracts.company_id,
+			intern_ra=record_contracts.intern_ra
+		)
+	elif not simple:
+		if sub_contr:
+			start_date = sub_contr.start_date
+			ending_date = sub_contr.ending_date
+			if validate_date(start_date, ending_date):
+				status = 1
+			else:
+				status = 0
+
+			subcontracts = [
+				{
+					"start_date": split_dates(start_date), 
+					"ending_date": split_dates(ending_date)
+			}]
+		else:
+			status = 0
+			subcontracts = []
+
+		dict_contracts= dict(
+			company_id=record_contracts.company_id,
+			intern_ra=record_contracts.intern_ra,
+			status=status,
+			subcontracts=subcontracts,
+		)
+	else:
+		dict_contracts = {}
+		
+	return dict_contracts
+
+
+def get_all_contracts_helper(record_contracts):
+	list_contracts = []
+	for each in record_contracts:
+		dict_contract = make_dict_contracts(each, simple=True)
+		list_contracts.append(dict_contract)
+
+	dict_contracts = dict(internship_contracts=list_contracts)
+	return dict_contracts
+
+
+def get_one_contract_helper(record_contract):
+	last_sub_contr = get_last_contracts(record_contract.id)
+	dict_contracts = dict(internship_contract=make_dict_contracts(record_contract, last_sub_contr))
+	return dict_contracts
+
+
+def split_dates(current_date):
+	if current_date:
+		current_date = current_date.split("T")
+		current_date = current_date[0] if current_date else ""
+	else:
+		current_date = ""
+
+	return current_date
+
+
+def validate_date(start_date, ending_date):
+	start = parser.parse(start_date).replace(tzinfo=None)
+	ending = parser.parse(ending_date).replace(tzinfo=None)
+	current_data = datetime.utcnow()
+	if all([current_data > start, current_data < ending]):
+		return True
+	else:
+		return False
+
+
+def get_last_contracts(contract_id):
+	sub_contracts = SubContracts.get_one_sub_contract(contract_id)
+	if isinstance(sub_contracts, list):
+		if not sub_contracts:
+			return False
+
+		chosen = sub_contracts[0]
+		if chosen:
+			chosen_date = parser.parse(chosen.ending_date)
+			for sub_contract in sub_contracts:
+				current_date = parser.parse(sub_contract.ending_date)
+				if current_date > chosen_date:
+					chosen = sub_contract
+					chosen_date = current_date
+	elif sub_contracts:
+		chosen = sub_contracts
+	else:
+		return False
+
+	return chosen
+
+
+def interns_by_companies():
+	all_interns_count = []
+	all_companies = Company.get_all_company()
+	if not all_companies or not isinstance(all_companies, list):
+		return None
+	for each_company in all_companies:
+		interns_count = 0
+		dict_company = {"company_name": each_company.company_name}
+
+		contracts = Contracts.get_company_contracts(each_company.id)
+		if not contracts:
+			dict_company.update({"interns_count": interns_count})
+			all_interns_count.append(dict_company)
+			continue
+
+		for each_contract in  contracts:
+			dict_contract = get_one_contract_helper(each_contract)
+			if dict_contract.get("internship_contract", {}).get("status"):
+				interns_count += 1
+		dict_company.update({"interns_count": interns_count})
+		all_interns_count.append(dict_company)
+	return all_interns_count
+

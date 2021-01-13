@@ -375,12 +375,15 @@ class Contracts(db.Model):
         return Contracts.query.filter_by(id=value).first()
 
     @staticmethod
+    def get_company_contracts(value):
+        return Contracts.query.filter_by(company_id=value).all()
+
+    @staticmethod
     def get_specific_contract(data):
         return Contracts.query.filter_by(
             company_id=data.get("company_id"),
             intern_ra=data.get("intern_ra")).first()
         
-
     @staticmethod
     def get_all_contracts():
         return Contracts.query.all()

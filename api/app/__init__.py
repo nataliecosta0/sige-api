@@ -59,6 +59,9 @@ def create_app(config=app_settings):
 	from app.internship_contracts import internship_contracts_blueprint
 	this_app.register_blueprint(internship_contracts_blueprint)
 
+	from app.dashboard import dashboard_blueprint
+	this_app.register_blueprint(dashboard_blueprint)
+
 	this_app.config['MAIL_SERVER']=base_config.MAIL_SERVER
 	this_app.config['MAIL_PORT']=base_config.MAIL_PORT
 	this_app.config['MAIL_USE_SSL']=True
